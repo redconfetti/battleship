@@ -1,2 +1,0 @@
-battleship = angular.module('battleship',[
-])
