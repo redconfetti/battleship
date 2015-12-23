@@ -2,6 +2,8 @@
 
 Rails based Battleship game
 
+See Demo at [http://battleship.redconfetti.com/](http://battleship.redconfetti.com/)
+
 ## Specifications
 
 Each of the following ships are assembled randomly onto a 10 x 10 battle grid for each player.
