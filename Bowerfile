@@ -1,0 +1,10 @@
+# Bowerfile
+# Check out https://github.com/rharriso/bower-rails/#ruby-dsl-configuration for more options
+
+# Twitter Bootstrap
+# http://getbootstrap.com/
+asset 'bootstrap-sass-official'
+
+# AngularJS
+# https://angularjs.org/
+asset 'angular'
