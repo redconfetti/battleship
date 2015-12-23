@@ -32,6 +32,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Flexible authentication solution for Rails
+# https://github.com/plataformatec/devise
+gem 'devise'
+
 # Bundler-like DSL + rake tasks for Bower on Rails
 # https://github.com/rharriso/bower-rails/
 gem 'bower-rails'
