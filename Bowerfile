@@ -9,3 +9,7 @@ asset 'bootstrap-sass-official'
 # https://angularjs.org/
 asset 'angular'
 asset 'angular-route'
+
+# Angular-Devise
+# https://github.com/cloudspace/angular_devise
+asset 'angular-devise'

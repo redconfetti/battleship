@@ -15,6 +15,7 @@
 //= require angular/angular
 //= require angular-route/angular-route
 //= require angular-rails-templates
+//= require angular-devise/lib/devise-min
 //= require_tree .
 
 // AngularJS Application
