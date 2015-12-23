@@ -1,2 +1,3 @@
-# battleship
+# Battleship
+
 Rails based Battleship game
