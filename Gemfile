@@ -40,6 +40,9 @@ gem 'bower-rails'
 # https://github.com/pitr/angular-rails-templates
 gem 'angular-rails-templates'
 
+# Needed for compatibility with angular-rails-templates
+gem 'sprockets', '2.12.3'
+
 # Manage Procfile-based applications
 gem "foreman"
 
