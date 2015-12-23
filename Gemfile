@@ -36,6 +36,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # https://github.com/rharriso/bower-rails/
 gem 'bower-rails'
 
+# Use your angular templates with rails' asset pipeline
+# https://github.com/pitr/angular-rails-templates
+gem 'angular-rails-templates'
+
 # Manage Procfile-based applications
 gem "foreman"
 

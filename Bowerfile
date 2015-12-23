@@ -8,3 +8,4 @@ asset 'bootstrap-sass-official'
 # AngularJS
 # https://angularjs.org/
 asset 'angular'
+asset 'angular-route'
