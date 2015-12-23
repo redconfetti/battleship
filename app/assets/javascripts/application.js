@@ -19,5 +19,7 @@
 //= require_tree .
 
 // AngularJS Application
-//= require controllers/homeController
+//= require configuration/authConfiguration
 //= require configuration/routeConfiguration
+//= require controllers/homeController
+//= require controllers/registrationController
