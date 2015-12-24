@@ -1,5 +1,8 @@
-angular.module('battleship', ['Devise'])
-	config(['AuthProvider', function(AuthProvider) {
-		// Customize the resource name data use namespaced under
-    AuthProvider.resourceName('player');
-  });
+angular.module('battleship').config(['AuthProvider', function(AuthProvider) {
+  // Customize the resource name data use namespaced under
+  AuthProvider.resourceName('player');
+
+  // Customize register
+  AuthProvider.registerMethod('POST');
+  AuthProvider.registerPath('/players.json');
+}]);
