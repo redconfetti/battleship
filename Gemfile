@@ -44,9 +44,9 @@ gem 'bower-rails'
 # https://github.com/pitr/angular-rails-templates
 gem 'angular-rails-templates'
 
-# Rails integration for AngularJS style CSRF protection
-# https://github.com/jsanders/angular_rails_csrf
-gem 'angular_rails_csrf'
+# Extends Rails CSRF protection to play nicely with AngularJS
+# https://github.com/Sinbadsoft/angular_csrf
+gem 'angular_csrf'
 
 # Needed for compatibility with angular-rails-templates
 gem 'sprockets', '2.12.3'
