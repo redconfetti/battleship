@@ -1,24 +1,30 @@
-<div class="container">
+<div data-ng-if="registrationSuccess">
+  <p class="alert alert-success">
+    Your new account was successfully registered!
+    <a href="#/login">Login</a>
+  </p>
+</div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4>Sign up</h4>
-    </div>
+<div class="panel panel-default" data-ng-hide="registrationSuccess || isAuthenticated">
+  <div class="panel-heading">
+    <h4>Sign up</h4>
   </div>
 
   <div class="panel-body">
     <form>
-      <div class="form-group">
-        <label for="emailAddress">Email address</label>
-        <input type="email" class="form-control" id="emailAddress" placeholder="Email" data-ng-model="email">
+      <div class="form-group" data-ng-class="{'has-error': registrationErrors.email}">
+        <label class="control-label" for="email">Email address</label>
+        <input type="email" class="form-control" id="email" placeholder="Email" data-ng-model="email">
+        <p class="help-block" data-ng-repeat="message in registrationErrors.email">
+          <span data-ng-bind-template="Email {{message}}"></span>
+        </p>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" placeholder="Password" data-ng-model="password">
-      </div>
-      <div class="form-group">
-        <label for="passwordConfirmation">Password Confirmation</label>
-        <input type="password" class="form-control" id="passwordConfirmation" placeholder="Password" data-ng-model="passwordConfirmation">
+      <div class="form-group" data-ng-class="{'has-error': registrationErrors.password}">
+        <label class="control-label" for="password">Password</label>
+        <input type="password" class="form-control" id="password" data-ng-model="password">
+        <p class="help-block" data-ng-repeat="message in registrationErrors.password">
+          <span data-ng-bind-template="Password {{message}}"></span>
+        </p>
       </div>
       <button class="btn btn-primary" data-ng-click="submitRegistration()">Sign up</button>
     </form>

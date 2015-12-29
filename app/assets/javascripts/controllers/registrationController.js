@@ -1,13 +1,10 @@
 angular.module('battleship').controller('RegistrationController', ['$scope', '$routeParams', 'Auth', function RegistrationController($scope, $routeParams, Auth) {
 
   $scope.submitRegistration = function() {
-
     var credentials = {
       email: $scope.email,
-      password: $scope.password,
-      password_confirmation: $scope.password_confirmation
+      password: $scope.password
     };
-    console.log(credentials);
 
     var config = {
       headers: {
@@ -16,18 +13,16 @@ angular.module('battleship').controller('RegistrationController', ['$scope', '$r
     };
 
     Auth.register(credentials, config).then(function(registeredPlayer) {
-      console.log('success');
-      console.log(registeredPlayer);
+      $scope.registrationSuccess = true;
+      $scope.registrationErrors = null;
     }, function(error) {
-      console.log('failure');
-      console.log(error);
+      $scope.registrationSuccess = false;
+      $scope.registrationErrors = error.data.errors;
     });
 
     $scope.$on('devise:new-registration', function(event, player) {
-      console.log('new player');
-      console.log(player);
+      $scope.registrationSuccess = true;
     });
-
   };
 
 }]);

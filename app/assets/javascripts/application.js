@@ -22,4 +22,5 @@
 //= require configuration/authConfiguration
 //= require configuration/routeConfiguration
 //= require controllers/homeController
+//= require controllers/loginController
 //= require controllers/registrationController

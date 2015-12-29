@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="battleship" data-ng-controller="BattleshipController">
 <head>
   <title>Battleship</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => false %>
@@ -17,25 +17,28 @@
 			    <span class="icon-bar"></span>
 			    <span class="icon-bar"></span>
 			  </button>
-			  <a class="navbar-brand" href="#">Battleship</a>
+			  <a class="navbar-brand" href="/#/">Battleship</a>
 			</div>
 	    <div id="navbar" class="navbar-collapse collapse">
-	      <form class="navbar-form navbar-right">
-	        <div class="form-group">
-	          <input type="text" placeholder="Email" class="form-control">
-	        </div>
-	        <div class="form-group">
-	          <input type="password" placeholder="Password" class="form-control">
-	        </div>
-	        <button type="submit" class="btn btn-success">Sign in</button>
-	      </form>
+        <form class="navbar-form navbar-right" ng-controller="LoginController">
+          <div data-ng-if="!isAuthenticated">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control" data-ng-model="$parent.email">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control" data-ng-model="$parent.password">
+            </div>
+            <button class="btn btn-success" data-ng-click="$parent.createSession()">Sign in</button>
+          </div>
+          <button class="btn btn-success" data-ng-click="destroySession()" data-ng-if="isAuthenticated">Sign out</button>
+        </form>
 	    </div><!--/.navbar-collapse -->
     </div>
   </nav>
 
-	<div class="container" ng-app="battleship">
-		<%= yield %>
-	</div>
+  <div class="container">
+    <%= yield %>
+  </div>
 
 </body>
 </html>

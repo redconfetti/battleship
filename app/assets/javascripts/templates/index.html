@@ -2,10 +2,10 @@
   <div class="container">
     <h1>Play Online</h1>
     <p>Play the classic <a href="https://en.wikipedia.org/wiki/Battleship_%28game%29" target="_blank">Battleship</a> guessing game online.</p>
-    <p data-ng-bind="greeting"></p>
     <p>
-      <a class="btn btn-primary btn-lg" data-ng-href="#/sign-up" role="button">Sign-Up &raquo;</a>
-      <a class="btn btn-primary btn-lg" data-ng-href="#/login" role="button">Login &raquo;</a>
+      <a class="btn btn-primary btn-lg" data-ng-href="#/sign-up" role="button" data-ng-if="!isAuthenticated">Sign-Up &raquo;</a>
+      <a class="btn btn-primary btn-lg" data-ng-href="#/login" role="button" data-ng-if="!isAuthenticated">Login &raquo;</a>
+      <a class="btn btn-primary btn-lg" data-ng-href="#/play" role="button" data-ng-if="isAuthenticated">Play Game</a>
     </p>
   </div>
 </div>
