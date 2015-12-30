@@ -13,9 +13,10 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
     };
 
     Auth.login(credentials, config).then(function(player) {
-      console.log(player);
+      $scope.loginError = false;
+      $window.location.href = '/';
     }, function(error) {
-      console.log(error);
+      $scope.loginError = error.data.error;
     });
 
   };
@@ -28,10 +29,9 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
     };
 
     Auth.logout(config).then(function(oldUser) {
-      // console.log(oldUser);
       $rootScope.isAuthenticated = Auth.isAuthenticated();
     }, function(error) {
-      console.log('logged out user error');
+      console.log('error logging out of session');
       console.log(error);
     });
   };
@@ -43,10 +43,6 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
     if ( ['#/sign-up', '#/login'].indexOf($window.location.hash) !== -1 ) {
       $window.location.href = '/';
     }
-  });
-
-  $scope.$on('devise:new-session', function(event, currentUser) {
-    // console.log('new session established');
   });
 
 }]);
