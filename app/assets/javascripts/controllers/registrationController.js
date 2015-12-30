@@ -1,4 +1,4 @@
-angular.module('battleship').controller('RegistrationController', ['$scope', '$routeParams', 'Auth', function RegistrationController($scope, $routeParams, Auth) {
+angular.module('battleship').controller('RegistrationController', ['$scope', 'Auth', function RegistrationController($scope, Auth) {
 
   $scope.submitRegistration = function() {
     var credentials = {

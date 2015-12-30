@@ -1,4 +1,4 @@
-angular.module('battleship').controller('LoginController', ['$rootScope', '$scope', '$routeParams', '$window', 'Auth', function LoginController($rootScope, $scope, $routeParams, $window, Auth) {
+angular.module('battleship').controller('LoginController', ['$rootScope', '$scope', '$window', 'Auth', function LoginController($rootScope, $scope, $window, Auth) {
 
   $scope.createSession = function() {
     var credentials = {
@@ -31,7 +31,7 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
     Auth.logout(config).then(function(oldUser) {
       $rootScope.isAuthenticated = Auth.isAuthenticated();
     }, function(error) {
-      console.log('error logging out of session');
+      // console.log('error logging out of session');
       console.log(error);
     });
   };

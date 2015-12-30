@@ -1,3 +1,3 @@
-angular.module('battleship').controller('HomeController', ['$scope', '$routeParams', '$location', function HomeController($scope, $routeParams, $location) {
+angular.module('battleship').controller('HomeController', ['$scope', function HomeController($scope) {
 }]);
 
