@@ -16,6 +16,8 @@ Each of the following ships are assembled randomly onto a 10 x 10 battle grid fo
 | Destroyer        | 2    |
 | Submarine        | 1    |
 
+See [Battleship game](https://en.wikipedia.org/wiki/Battleship_%28game%29) for further history.
+
 # Development Notes
 
 ## Setup
