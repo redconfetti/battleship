@@ -8,7 +8,7 @@ var battleship = angular.module('battleship', [
 /**
  * Battleship main controller
  */
-angular.module('battleship').controller('BattleshipController', ['$rootScope', 'Auth', function($rootScope, Auth) {
+angular.module('battleship').controller('BattleshipController', ['$rootScope', '$window', 'Auth', function($rootScope, $window, Auth) {
 
   /**
    * Will be executed on every route change

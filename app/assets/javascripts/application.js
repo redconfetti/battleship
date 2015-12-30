@@ -21,7 +21,7 @@
 // AngularJS Application
 //= require configuration/authConfiguration
 //= require configuration/routeConfiguration
-//= require controllers/gameIndexController
+//= require controllers/gameController
 //= require controllers/homeController
 //= require controllers/loginController
 //= require controllers/registrationController

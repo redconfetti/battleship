@@ -1,4 +1,4 @@
-angular.module('battleship').controller('GameIndexController', ['$http', '$scope', function GameIndexController($http, $scope) {
+angular.module('battleship').controller('GameController', ['$http', '$scope', function GameController($http, $scope) {
 
   $scope.getPendingGames = function() {
     $scope.pendingGames = [];

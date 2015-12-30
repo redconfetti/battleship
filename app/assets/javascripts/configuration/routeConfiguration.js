@@ -13,8 +13,8 @@ angular.module('battleship').config(['$routeProvider', function($routeProvider) 
       controller: 'LoginController',
     })
     .when('/play', {
-      templateUrl: 'gameIndex.html',
-      controller: 'GameIndexController',
+      templateUrl: 'game.html',
+      controller: 'GameController',
     })
     .otherwise({ redirectTo: '/' });
 }]);
