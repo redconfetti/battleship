@@ -5,6 +5,10 @@ Rails.application.routes.draw do
 
   root 'home#index'
 
+  resources :games, only: [:index] do
+    get 'pending', on: :collection
+  end
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
