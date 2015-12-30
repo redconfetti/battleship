@@ -36,13 +36,8 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
     });
   };
 
-  $scope.$on('devise:login', function(event, currentUser) {
-    $rootScope.isAuthenticated = Auth.isAuthenticated();
-
-    // redirect to homepage when on signup or login page
-    if ( ['#/sign-up', '#/login'].indexOf($window.location.hash) !== -1 ) {
-      $window.location.href = '/';
-    }
-  });
+  $scope.goToLogin = function() {
+    $window.location.href = '/#/login';
+  };
 
 }]);
