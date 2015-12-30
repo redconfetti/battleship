@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.1'
 # Use postgres as the database for Active Record
@@ -61,6 +60,10 @@ group :production, :staging do
 end
 
 group :development, :test do
+  # Testing framework for Rails 3.x and 4.x
+  # https://github.com/rspec/rspec-rails
+  gem 'rspec-rails'
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
 

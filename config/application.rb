@@ -26,5 +26,14 @@ module Battleship
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    # Configure Generators
+    config.generators do |g|
+      g.orm             :active_record
+      g.template_engine :erb
+      g.test_framework  :rspec, fixture: false
+      g.stylesheets     false
+      g.javascripts     false
+    end
   end
 end
