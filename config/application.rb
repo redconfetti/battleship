@@ -32,6 +32,8 @@ module Battleship
       g.orm             :active_record
       g.template_engine :erb
       g.test_framework  :rspec, fixture: false
+      g.view_specs      false
+      g.helper_specs    false
       g.stylesheets     false
       g.javascripts     false
     end
