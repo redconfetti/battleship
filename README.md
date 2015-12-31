@@ -8,13 +8,13 @@ See Demo at [http://battleship.redconfetti.com/](http://battleship.redconfetti.c
 
 Each of the following ships are assembled randomly onto a 10 x 10 battle grid for each player.
 
-| Ship             | Size |
-| ---------------- | ---- |
-| Aircraft Carrier | 5    |
-| Battleship       | 4    |
-| Cruiser          | 3    |
-| Destroyer        | 2    |
-| Submarine        | 1    |
+| Ship             | Size | Quantity |
+| ---------------- | ---- | -------- |
+| Aircraft Carrier | 5    | 1        |
+| Battleship       | 4    | 1        |
+| Cruiser          | 3    | 1        |
+| Destroyer        | 2    | 2        |
+| Submarine        | 1    | 2        |
 
 See [Battleship game](https://en.wikipedia.org/wiki/Battleship_%28game%29) for further history.
 
