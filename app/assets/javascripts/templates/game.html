@@ -29,7 +29,7 @@
 
     <div data-ng-if="pendingGames.length === 0">
       <p>There are currently no games pending to join.</p>
-      <a href="/#/games/new/" class="btn btn-primary">Start New Game</a>
+      <button class="btn btn-primary" data-ng-click="startNewGame()">Start New Game</button>
     </div>
 
   </div>

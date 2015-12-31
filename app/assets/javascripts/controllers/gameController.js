@@ -13,5 +13,17 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', fu
     });
   };
 
+  $scope.startNewGame = function() {
+    $http({
+      method: 'POST',
+      url: '/games.json'
+    }).then(function successCallback(response) {
+      $scope.newGame = response.data;
+    }, function errorCallback(response) {
+      $scope.newGameError = true;
+    });
+  };
+
+  // Initialize
   $scope.getPendingGames();
 }]);
