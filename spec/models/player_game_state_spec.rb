@@ -1,6 +1,9 @@
 require 'rails_helper'
+require 'set'
 
 RSpec.describe PlayerGameState, type: :model do
+
+
   let(:game)                { Game.create(created_at: '2015-01-26 04:15:32') }
   let(:player1)             { Player.create(email: 'johndoe@example.com', password: 'someP@$$word') }
   let(:player2)             { Player.create(email: 'jane@example.com', password: '$3cr3tP@$$w0rD') }
@@ -49,7 +52,6 @@ RSpec.describe PlayerGameState, type: :model do
   end
 
   describe 'before_creation' do
-
     it 'initializes the battle and tracking grids' do
       game_state = player1_game_state
 
@@ -65,6 +67,168 @@ RSpec.describe PlayerGameState, type: :model do
             expect(y).to eq 'w'
           end
         end
+      end
+    end
+  end
+
+  describe 'battlegrid generation' do
+
+    describe '#build_battle_grid' do
+      it 'randomly places ships on players battle grid'
+    end
+
+    describe '#available_placements' do
+      context 'when spaces taken' do
+        before { subject.place_ship(5, 4, 5, 'S') }
+        it 'returns available spaces' do
+          result = subject.available_placements(2)
+          placement_set = Set.new result
+          expect(placement_set.include? [0, 0, "S"]).to eq true
+          expect(placement_set.include? [1, 0, "S"]).to eq true
+          expect(placement_set.include? [1, 0, "S"]).to eq true
+          expect(placement_set.include? [1, 0, "S"]).to eq true
+          expect(placement_set.include? [3, 4, "E"]).to eq true
+          expect(placement_set.include? [3, 8, "E"]).to eq true
+        end
+
+        it 'does not return unavailable spaces' do
+          result = subject.available_placements(2)
+          placement_set = Set.new result
+          expect(placement_set.include? [5, 4, "S"]).to eq false
+          expect(placement_set.include? [5, 5, "S"]).to eq false
+          expect(placement_set.include? [5, 6, "S"]).to eq false
+          expect(placement_set.include? [5, 7, "S"]).to eq false
+          expect(placement_set.include? [5, 8, "S"]).to eq false
+          expect(placement_set.include? [4, 4, "E"]).to eq false
+          expect(placement_set.include? [4, 8, "E"]).to eq false
+        end
+      end
+
+      context 'when no spaces taken' do
+        it 'returns all spaces' do
+          result = subject.available_placements(3)
+          expect(result).to be_an_instance_of Array
+          expect(result.count).to eq 160
+          result.each do |placement|
+            expect(placement).to be_an_instance_of Array
+            expect(placement.count).to eq 3
+            expect(placement[0]).to be_an_instance_of Fixnum
+            expect(placement[1]).to be_an_instance_of Fixnum
+            expect(['S', 'E'].index(placement[2])).to_not be_nil
+          end
+        end
+      end
+
+      context 'when all spaces taken' do
+        before do
+          subject.grid_map!('battle') { |grid, x, y| grid[x][y] = 's' }
+        end
+        it 'returns no spaces' do
+          result = subject.available_placements(2)
+          expect(result).to be_an_instance_of Array
+          expect(result.count).to eq 0
+        end
+      end
+    end
+
+    describe '#place_ship' do
+      it 'raises exception if placement is not valid' do
+        expect { subject.place_ship(8, 2, 3, 'E') }.to raise_error(ArgumentError, "Invalid placement for 3 space ship at [8,2] positioned E")
+      end
+
+      it 'places ship in correct coordinates horizontally' do
+        subject.place_ship(3, 5, 3, 'E')
+        expect(subject.battle_grid[3][5]).to eq 's' # first space should be ship
+        expect(subject.battle_grid[4][5]).to eq 's' # second space should be ship
+        expect(subject.battle_grid[5][5]).to eq 's' # third space should be ship
+        expect(subject.battle_grid[2][5]).to eq 'w' # west of first space should be water
+        expect(subject.battle_grid[3][4]).to eq 'w' # north of first space should be water
+        expect(subject.battle_grid[3][6]).to eq 'w' # south of first space should be water
+        expect(subject.battle_grid[6][5]).to eq 'w' # east of last space should be water
+      end
+
+      it 'places ship in correct coordinates vertically' do
+        subject.place_ship(3, 5, 3, 'S')
+        expect(subject.battle_grid[3][5]).to eq 's' # first space should be ship
+        expect(subject.battle_grid[3][6]).to eq 's' # second space should be ship
+        expect(subject.battle_grid[3][7]).to eq 's' # third space should be ship
+        expect(subject.battle_grid[2][5]).to eq 'w' # west of first space should be water
+        expect(subject.battle_grid[3][4]).to eq 'w' # north of first space should be water
+        expect(subject.battle_grid[4][5]).to eq 'w' # east of first space should be water
+        expect(subject.battle_grid[3][8]).to eq 'w' # south of last space should be water
+      end
+    end
+
+    describe '#valid_placement?' do
+      it 'returns true when placement falls in of grid' do
+        expect(subject.valid_placement?(7, 2, 3, 'E')).to eq true
+        expect(subject.valid_placement?(2, 7, 3, 'S')).to eq true
+      end
+
+      it 'returns false when placement falls outside of grid' do
+        expect(subject.valid_placement?(8, 2, 3, 'E')).to eq false
+        expect(subject.valid_placement?(2, 8, 3, 'S')).to eq false
+      end
+    end
+
+    describe '#get_coordinates' do
+      it 'raises exception when invalid direction argument received' do
+        expect { subject.get_coordinates(4, 4, 3, 'N') }.to raise_error(ArgumentError, "Direction 'N' is invalid. Must be 'S' or 'E'")
+        expect { subject.get_coordinates(4, 4, 3, 'W') }.to raise_error(ArgumentError, "Direction 'W' is invalid. Must be 'S' or 'E'")
+      end
+
+      it 'returns coordinates' do
+        result = subject.get_coordinates(0, 0, 3, 'S')
+        expect(result).to be_an_instance_of Array
+        expect(result.count).to eq 3
+        expect(result).to eq [[0, 0], [0, 1], [0, 2]]
+
+        result = subject.get_coordinates(5, 7, 2, 'E')
+        expect(result).to be_an_instance_of Array
+        expect(result.count).to eq 2
+        expect(result).to eq [[5, 7], [6, 7]]
+      end
+
+      it 'returns false if coordinate falls outside of grid' do
+        expect(subject.get_coordinates(4, 9, 2, 'S')).to eq false
+        expect(subject.get_coordinates(9, 0, 2, 'E')).to eq false
+        expect(subject.get_coordinates(9, 9, 2, 'S')).to eq false
+        expect(subject.get_coordinates(9, 9, 2, 'E')).to eq false
+        expect(subject.get_coordinates(9, 8, 3, 'E')).to eq false
+        expect(subject.get_coordinates(6, 7, 4, 'S')).to eq false
+        expect(subject.get_coordinates(7, 8, 4, 'E')).to eq false
+      end
+    end
+
+    describe '#neighbor_position' do
+      it 'raises exception when invalid direction argument received' do
+        expect { subject.neighbor_position(4, 4, 'N') }.to raise_error(ArgumentError, "Direction 'N' is invalid. Must be 'S' or 'E'")
+        expect { subject.neighbor_position(4, 4, 'W') }.to raise_error(ArgumentError, "Direction 'W' is invalid. Must be 'S' or 'E'")
+      end
+
+      it 'returns position south' do
+        expect(subject.neighbor_position(4, 4, 'S')).to eq [4,5]
+      end
+
+      it 'returns position east' do
+        expect(subject.neighbor_position(4, 4, 'E')).to eq [5,4]
+      end
+    end
+
+    describe '#is_outside_of_grid?' do
+      it 'returns false when x and y in range' do
+        expect(subject.is_outside_of_grid?(1, 2)).to eq false
+        expect(subject.is_outside_of_grid?(0, 9)).to eq false
+        expect(subject.is_outside_of_grid?(9, 0)).to eq false
+        expect(subject.is_outside_of_grid?(4, 9)).to eq false
+      end
+
+      it 'returns true when x or y are out of range' do
+        expect(subject.is_outside_of_grid?(1, -1)).to eq true
+        expect(subject.is_outside_of_grid?(-2, 0)).to eq true
+        expect(subject.is_outside_of_grid?(10, 4)).to eq true
+        expect(subject.is_outside_of_grid?(4, 10)).to eq true
+        expect(subject.is_outside_of_grid?(11, -1)).to eq true
       end
     end
 
