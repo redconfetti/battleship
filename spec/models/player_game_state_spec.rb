@@ -47,4 +47,24 @@ RSpec.describe PlayerGameState, type: :model do
       expect(player3_game_state.errors).to have_key(:game)
     end
   end
+
+  describe 'before_creation' do
+    it 'initializes the battle and tracking grids' do
+      game_state = player1_game_state
+
+      tracking_grid = game_state.tracking_grid
+      expect(tracking_grid).to be_an_instance_of Hash
+      expect(tracking_grid.count).to eq 100
+      tracking_grid.each do |key, value|
+        expect(value).to eq false
+      end
+
+      battle_grid = game_state.battle_grid
+      expect(battle_grid).to be_an_instance_of Hash
+      expect(battle_grid.count).to eq 100
+      battle_grid.each do |key, value|
+        expect(value).to eq false
+      end
+    end
+  end
 end
