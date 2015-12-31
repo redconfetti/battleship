@@ -3,6 +3,12 @@ class Game < ActiveRecord::Base
 
   has_many :player_game_states
 
+  def self.create_with_associated_player(player)
+    game = Game.create
+    game.player_game_states.create(player: player)
+    game
+  end
+
   def as_json(options = {})
     super().merge({
       'startDate' => self.created_at.strftime('%m/%d/%y %I:%M %p'),

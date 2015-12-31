@@ -1,7 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
+  let(:player1) { Player.create(email: 'johndoe@example.com', password: 'someP@$$word') }
   subject { Game.create(created_at: '2015-01-26 04:15:32') }
+
+  describe '.create_with_associated_player' do
+    it 'creates game with specified player associated' do
+      result = Game.create_with_associated_player(player1)
+      player_game_states = result.player_game_states
+      expect(result).to be_an_instance_of Game
+      expect(player_game_states.count).to eq 1
+      expect(player_game_states[0].player_id).to eq player1.id
+      expect(player_game_states[0].player.email).to eq 'johndoe@example.com'
+    end
+  end
 
   describe '#as_json' do
     it 'returns json representation' do
