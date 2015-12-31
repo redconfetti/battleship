@@ -4,8 +4,8 @@ class PlayerGameState < ActiveRecord::Base
 
   validate :limit_two_per_game
 
-  serialize :battle_grid, Hash
-  serialize :tracking_grid, Hash
+  serialize :battle_grid, Array
+  serialize :tracking_grid, Array
 
   before_create :init_grids
 
@@ -21,10 +21,14 @@ class PlayerGameState < ActiveRecord::Base
   end
 
   def init_grids
+    self.tracking_grid = []
+    self.battle_grid = []
     (0..9).to_a.each do |x|
+      self.tracking_grid[x] = []
+      self.battle_grid[x] = []
       (0..9).to_a.each do |y|
-        tracking_grid["#{x},#{y}"] = false
-        battle_grid["#{x},#{y}"] = false
+        self.tracking_grid[x][y] = 'w'
+        self.battle_grid[x][y] = 'w'
       end
     end
   end
