@@ -16,9 +16,9 @@ class GamesController < ApplicationController
   end
 
   def create
-    new_game = Game.create
+    new_game = Game.create_with_associated_player(current_player)
     respond_to do |format|
-      format.json { render json: new_game }
+      format.json { render json: new_game.to_json(:include => :player_game_states) }
     end
   end
 end
