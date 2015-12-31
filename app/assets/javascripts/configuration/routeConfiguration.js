@@ -12,7 +12,7 @@ angular.module('battleship').config(['$routeProvider', function($routeProvider) 
       templateUrl: 'login.html',
       controller: 'LoginController',
     })
-    .when('/play', {
+    .when('/games', {
       templateUrl: 'game.html',
       controller: 'GameController',
     })
