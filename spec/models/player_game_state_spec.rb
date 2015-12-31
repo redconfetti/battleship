@@ -74,7 +74,21 @@ RSpec.describe PlayerGameState, type: :model do
   describe 'battlegrid generation' do
 
     describe '#build_battle_grid' do
-      it 'randomly places ships on players battle grid'
+      let(:shuffled_fleet) { [2,1,1,2,5,4,3] }
+      before do
+        # stub randomized result with static expectation
+        fleet_stub = double(shuffle: shuffled_fleet)
+        stub_const("PlayerGameState::FLEET", fleet_stub)
+      end
+
+      it 'places proper number of ship spaces on grid' do
+        subject.build_battle_grid
+        battle_spaces = subject.battle_grid.flatten
+        water_spaces = battle_spaces.reject { |space| space != 'w' }
+        expect(water_spaces.count).to eq 82
+        ship_spaces = battle_spaces.reject { |space| space != 's' }
+        expect(ship_spaces.count).to eq 18
+      end
     end
 
     describe '#available_placements' do

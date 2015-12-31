@@ -14,6 +14,8 @@ class PlayerGameState < ActiveRecord::Base
   # s = ship
   # h = hit ship
 
+  FLEET = [5,4,3,2,2,1,1]
+
   def self.for_game(game_id)
     where(game_id: game_id)
   end
@@ -38,7 +40,10 @@ class PlayerGameState < ActiveRecord::Base
   end
 
   def build_battle_grid
-    false
+    PlayerGameState::FLEET.shuffle.each do |ship_length|
+      space = available_placements(ship_length).sample
+      place_ship(space[0], space[1], ship_length, space[2])
+    end
   end
 
   # Returns available placements for battlegrid
@@ -114,6 +119,20 @@ class PlayerGameState < ActiveRecord::Base
         yield(battle_grid, x,y) if grid_type == 'tracking'
       end
     end
+  end
+
+  # Displays battle grid in console for human verification (and warm fuzzies)
+  def print_grid
+    print "\n"
+    (0..9).to_a.each do |x|
+      print '|'
+      (0..9).to_a.each do |y|
+        print ' ' + battle_grid[x][y] + ' '
+      end
+      print "|\n"
+    end
+    $stdout.flush
+    puts
   end
 
 end
