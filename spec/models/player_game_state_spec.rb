@@ -53,43 +53,29 @@ RSpec.describe PlayerGameState, type: :model do
 
   describe 'before_creation' do
     it 'initializes the battle and tracking grids' do
-      game_state = player1_game_state
-
-      tracking_grid = game_state.tracking_grid
-      battle_grid = game_state.battle_grid
+      tracking_grid = subject.tracking_grid
+      battle_grid = subject.battle_grid
 
       [tracking_grid, battle_grid].each do |grid|
         expect(grid).to be_an_instance_of Array
         expect(grid.count).to eq 10
         grid.each do |x|
           expect(x.count).to eq 10
-          x.each do |y|
-            expect(y).to eq 'w'
-          end
         end
       end
+    end
+
+    it 'automatically places ships on battlegrid' do
+      battle_spaces = subject.battle_grid.flatten
+      water_spaces = battle_spaces.reject { |space| space != 'w' }
+      expect(water_spaces.count).to eq 82
+      ship_spaces = battle_spaces.reject { |space| space != 's' }
+      expect(ship_spaces.count).to eq 18      
     end
   end
 
   describe 'battlegrid generation' do
-
-    describe '#build_battle_grid' do
-      let(:shuffled_fleet) { [2,1,1,2,5,4,3] }
-      before do
-        # stub randomized result with static expectation
-        fleet_stub = double(shuffle: shuffled_fleet)
-        stub_const("PlayerGameState::FLEET", fleet_stub)
-      end
-
-      it 'places proper number of ship spaces on grid' do
-        subject.build_battle_grid
-        battle_spaces = subject.battle_grid.flatten
-        water_spaces = battle_spaces.reject { |space| space != 'w' }
-        expect(water_spaces.count).to eq 82
-        ship_spaces = battle_spaces.reject { |space| space != 's' }
-        expect(ship_spaces.count).to eq 18
-      end
-    end
+    before { subject.init_grids }
 
     describe '#available_placements' do
       context 'when spaces taken' do
@@ -243,6 +229,26 @@ RSpec.describe PlayerGameState, type: :model do
         expect(subject.is_outside_of_grid?(10, 4)).to eq true
         expect(subject.is_outside_of_grid?(4, 10)).to eq true
         expect(subject.is_outside_of_grid?(11, -1)).to eq true
+      end
+    end
+
+    describe '#grid_collect' do
+      it 'returns all elements where code block is not false' do
+        subject.place_ship(2, 3, 2, 'E')
+        result = subject.grid_collect('battle') { |grid, x, y| [x,y] if grid[x][y] != 'w' } # get all non-water
+        expect(result).to be_an_instance_of Array
+        expect(result.count).to eq 2
+        expect(result[0]).to eq [2,3]
+        expect(result[1]).to eq [3,3]
+      end
+    end
+
+    describe '#grid_map!' do
+      it 'allows custom operation on each grid space' do
+        subject.grid_map!('battle') { |grid, x, y| grid[x][y] = 's' } # set all spaces to 's'
+        battle_spaces = subject.battle_grid.flatten
+        water_spaces = battle_spaces.reject { |space| space != 'w' }
+        expect(water_spaces.count).to eq 0
       end
     end
 
