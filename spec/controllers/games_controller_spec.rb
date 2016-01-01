@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
-  let(:player) { create(:player) }
+  let(:game_with_players)   { create(:game_with_players) }
 
   before :each do
     request.env["HTTP_ACCEPT"] = 'application/json'
-    sign_in player
+    sign_in game_with_players.player_game_states[0].player
   end
 
   describe "GET #index" do
@@ -19,6 +19,24 @@ RSpec.describe GamesController, type: :controller do
     it "returns http success" do
       get :pending
       expect(response).to have_http_status(:success)
+    end
+
+    it "includes player game states" do
+      get :pending
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      expect(json_response).to be_an_instance_of Array
+      expect(json_response.count).to eq 1
+      expect(json_response[0]).to be_an_instance_of Hash
+      game_states = json_response[0]['player_game_states']
+      expect(game_states).to be_an_instance_of Array
+      expect(game_states.count).to eq 2
+      game_states.each do |game_state|
+        expect(game_state['game_id']).to be_an_instance_of Fixnum
+        expect(game_state['player_id']).to be_an_instance_of Fixnum
+        expect(game_state['battle_grid']).to be_an_instance_of Array
+        expect(game_state['tracking_grid']).to be_an_instance_of Array
+      end
     end
   end
 

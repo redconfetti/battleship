@@ -9,9 +9,9 @@ class GamesController < ApplicationController
   end
 
   def pending
-    pending_games = Game.pending
+    pending_games = Game.includes(:player_game_states).pending
     respond_to do |format|
-      format.json { render json: pending_games }
+      format.json { render json: pending_games.to_json(:include => :player_game_states) }
     end
   end
 
