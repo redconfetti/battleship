@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
-  let(:player) { Player.create(email: 'johndoe@example.com', password: 'someP@$$word') }
+  let(:player) { create(:player) }
 
   before :each do
     request.env["HTTP_ACCEPT"] = 'application/json'

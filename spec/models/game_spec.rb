@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
-  let(:player1) { Player.create(email: 'johndoe@example.com', password: 'someP@$$word') }
-  subject { Game.create(created_at: '2015-01-26 04:15:32') }
+  let(:player1) { create(:player1) }
+  subject       { create(:game) }
 
   describe '.create_with_associated_player' do
     it 'creates game with specified player associated' do
