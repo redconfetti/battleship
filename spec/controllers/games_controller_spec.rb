@@ -60,4 +60,12 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
+  describe "PUT #end" do
+    it "completes game" do
+      put :end, id: game_with_players.id
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      expect(json_response['status']).to eq 'complete'
+    end
+  end
 end

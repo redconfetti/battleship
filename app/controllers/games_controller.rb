@@ -1,6 +1,7 @@
 class GamesController < ApplicationController
   before_action :authenticate_player!
 
+  # GET /games.json
   def index
     games = Game.all
     respond_to do |format|
@@ -8,6 +9,7 @@ class GamesController < ApplicationController
     end
   end
 
+  # GET /games/pending.json
   def pending
     pending_games = Game.includes(:player_game_states).pending
     respond_to do |format|
@@ -15,10 +17,20 @@ class GamesController < ApplicationController
     end
   end
 
+  # POST /games.json
   def create
     new_game = Game.create_with_associated_player(current_player)
     respond_to do |format|
       format.json { render json: new_game.to_json(:include => :player_game_states) }
+    end
+  end
+
+  # PUT /games/:id/end
+  def end
+    game = Game.find(params[:id])
+    game.complete
+    respond_to do |format|
+      format.json { render json: game.to_json(:include => :player_game_states) }
     end
   end
 end
