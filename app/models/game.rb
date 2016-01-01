@@ -15,4 +15,8 @@ class Game < ActiveRecord::Base
       'startDateUnixTimestamp' => self.created_at.to_i
     })
   end
+
+  def complete
+    update(status: 'complete')
+  end
 end

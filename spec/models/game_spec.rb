@@ -31,4 +31,11 @@ RSpec.describe Game, type: :model do
       expect(result['startDateUnixTimestamp']).to eq 1422245732
     end
   end
+
+  describe '#complete' do
+    it 'updates game status as complete' do
+      subject.complete
+      expect(subject.reload.status).to eq 'complete'
+    end
+  end
 end
