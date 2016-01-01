@@ -2,32 +2,45 @@
   Unable to retrieve pending games list
 </div>
 
-<div class="panel panel-default">
+<div class="panel panel-default" data-ng-if="pendingGames.player.length > 0">
   <div class="panel-heading">
-    <h3 class="panel-title">Games</h3>
+    <h3 class="panel-title">My Game</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      You currently have a game in progress, started on
+      <span data-ng-bind="pendingGames.player[0].startDate"></span>.
+    </p>
+
+    <button class="btn btn-primary" data-ng-click="continuePlayerGame()">Continue Game</button>
+    <button class="btn btn-primary" data-ng-click="endPlayerGame()">End Game</button>
+  </div>
+</div>
+
+<div class="panel panel-default" data-ng-if="pendingGames.other.length > 0">
+  <div class="panel-heading">
+    <h3 class="panel-title">Pending Games</h3>
   </div>
 
   <div class="panel-body">
-    <div data-ng-if="pendingGames.length > 0">
-      <p>The following games are awaiting a second player. Choose to join any of the following:</p>
+    <p>The following games are awaiting a second player. Choose to join any of the following:</p>
 
-      <table class="table">
-        <tr>
-          <th>Status</th>
-          <th>Start Date</th>
-        </tr>
-        <tr data-ng-repeat="game in pendingGames">
-          <td>
-            <span data-ng-bind="game.status"></span>
-          </td>
-          <td>
-            <span data-ng-bind="game.startDate"></span>
-          </td>
-        </tr>
-      </table>
-    </div>
+    <table class="table">
+      <tr>
+        <th>Status</th>
+        <th>Start Date</th>
+      </tr>
+      <tr data-ng-repeat="game in pendingGames.other">
+        <td>
+          <span data-ng-bind="game.status"></span>
+        </td>
+        <td>
+          <span data-ng-bind="game.startDate"></span>
+        </td>
+      </tr>
+    </table>
 
-    <div data-ng-if="pendingGames.length === 0">
+    <div data-ng-if="pendingGames.other.length === 0">
       <p>There are currently no games pending to join.</p>
       <button class="btn btn-primary" data-ng-click="startNewGame()">Start New Game</button>
     </div>
