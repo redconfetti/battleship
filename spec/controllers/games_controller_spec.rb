@@ -5,6 +5,7 @@ RSpec.describe GamesController, type: :controller do
 
   before :each do
     request.env["HTTP_ACCEPT"] = 'application/json'
+    sign_in player
   end
 
   describe "GET #index" do
@@ -22,7 +23,6 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe "POST #create" do
-    before(:each) { sign_in player }
     it "creates new game with current player associated" do
       post :create
       expect(response).to have_http_status(:success)
