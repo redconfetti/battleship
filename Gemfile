@@ -64,6 +64,10 @@ group :development, :test do
   # https://github.com/rspec/rspec-rails
   gem 'rspec-rails'
 
+  # A library for setting up Ruby objects as test data
+  # https://github.com/thoughtbot/factory_girl
+  gem "factory_girl_rails", "~> 4.0"
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
 
