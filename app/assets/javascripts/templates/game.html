@@ -1,5 +1,5 @@
-<div class="alert alert-danger" role="alert" data-ng-if="pendingGamesError">
-  Unable to retrieve pending games list
+<div class="alert alert-danger" role="alert" data-ng-if="displayError">
+  <span data-ng-bind="displayError"></span>
 </div>
 
 <div class="panel panel-default" data-ng-if="pendingGames.player.length > 0">
@@ -12,33 +12,35 @@
       <span data-ng-bind="pendingGames.player[0].startDate"></span>.
     </p>
 
-    <button class="btn btn-primary" data-ng-click="continuePlayerGame()">Continue Game</button>
+    <a class="btn btn-primary" data-ng-href="{{currentPlayerGame.playPath}}">Continue Game</a>
     <button class="btn btn-primary" data-ng-click="endPlayerGame()">End Game</button>
   </div>
 </div>
 
-<div class="panel panel-default" data-ng-if="pendingGames.other.length > 0">
+<div class="panel panel-default" data-ng-if="pendingGames.player.length === 0">
   <div class="panel-heading">
     <h3 class="panel-title">Pending Games</h3>
   </div>
 
   <div class="panel-body">
-    <p>The following games are awaiting a second player. Choose to join any of the following:</p>
+    <div data-ng-if="pendingGames.other.length > 0">
+      <p>The following games are awaiting a second player. Choose to join any of the following:</p>
 
-    <table class="table">
-      <tr>
-        <th>Status</th>
-        <th>Start Date</th>
-      </tr>
-      <tr data-ng-repeat="game in pendingGames.other">
-        <td>
-          <span data-ng-bind="game.status"></span>
-        </td>
-        <td>
-          <span data-ng-bind="game.startDate"></span>
-        </td>
-      </tr>
-    </table>
+      <table class="table">
+        <tr>
+          <th>Status</th>
+          <th>Start Date</th>
+        </tr>
+        <tr data-ng-repeat="game in pendingGames.other">
+          <td>
+            <span data-ng-bind="game.status"></span>
+          </td>
+          <td>
+            <span data-ng-bind="game.startDate"></span>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <div data-ng-if="pendingGames.other.length === 0">
       <p>There are currently no games pending to join.</p>

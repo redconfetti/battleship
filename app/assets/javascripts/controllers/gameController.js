@@ -1,5 +1,6 @@
-angular.module('battleship').controller('GameController', ['$http', '$scope', 'Auth', function GameController($http, $scope, Auth) {
+angular.module('battleship').controller('GameController', ['$http', '$scope', '$window', 'Auth', function GameController($http, $scope, $window, Auth) {
 
+  // Segregates games by players current game and other players pending games
   var segregatePlayerGames = function(games, player) {
     var segregatedGames = {
       player: [],
@@ -17,6 +18,24 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', 'A
     return segregatedGames;
   };
 
+  // Establishes current game and game play route path
+  var setCurrentGame = function(game) {
+    $scope.currentPlayerGame = game;
+    $scope.currentPlayerGame.playPath = '/#/play/' + game.id;
+  };
+
+  $scope.endPlayerGame = function() {
+    // $scope.currentPlayerGame;
+    $http({
+      method: 'PUT',
+      url: '/games/'+ $scope.currentPlayerGame.id + '/end.json'
+    }).then(function successCallback(response) {
+      $scope.getPendingGames();
+    }, function errorCallback(response) {
+      $scope.displayError = 'Error ending current game';
+    });
+  };
+
   $scope.getPendingGames = function() {
     $http({
       method: 'GET',
@@ -25,11 +44,15 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', 'A
       $scope.pendingGames = response.data;
       Auth.currentUser().then(function(user) {
         $scope.pendingGames = segregatePlayerGames(response.data, user);
+        if ($scope.pendingGames.player.length > 0) {
+          setCurrentGame($scope.pendingGames.player[0]);
+        }
       }, function(error) {
-        $scope.pendingGamesError = true;
+        $scope.displayError = 'Unable to obtain current user';
       });
     }, function errorCallback(response) {
       $scope.pendingGamesError = true;
+      $scope.displayError = 'Unable to retrieve pending games list';
     });
   };
 
@@ -38,9 +61,10 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', 'A
       method: 'POST',
       url: '/games.json'
     }).then(function successCallback(response) {
-      $scope.newGame = response.data;
+      setCurrentGame(response.data);
+      $window.location.href = $scope.currentPlayerGame.playPath;
     }, function errorCallback(response) {
-      $scope.newGameError = true;
+      $scope.displayError = 'Error creating new game';
     });
   };
 
