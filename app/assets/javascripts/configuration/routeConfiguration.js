@@ -16,5 +16,9 @@ angular.module('battleship').config(['$routeProvider', function($routeProvider) 
       templateUrl: 'game.html',
       controller: 'GameController',
     })
+    .when('/play/:gameId', {
+      templateUrl: 'play.html',
+      controller: 'PlayController'
+    })
     .otherwise({ redirectTo: '/' });
 }]);
