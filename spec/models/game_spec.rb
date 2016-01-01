@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
-  let(:player1) { create(:player1) }
-  subject       { create(:game) }
+  let(:player1)           { create(:player1) }
+  let(:game_with_players) { create(:game_with_players) }
+  subject                 { create(:game) }
 
   describe '.create_with_associated_player' do
     it 'creates game with specified player associated' do
@@ -12,6 +13,17 @@ RSpec.describe Game, type: :model do
       expect(player_game_states.count).to eq 1
       expect(player_game_states[0].player_id).to eq player1.id
       expect(player_game_states[0].player.email).to eq 'johndoe@example.com'
+    end
+  end
+
+  describe '#players' do
+    it 'returns players associated through PlayerGameStates' do
+      result = game_with_players.players
+      expect(result).to be_an_instance_of Player::ActiveRecord_Associations_CollectionProxy
+      expect(result.count).to eq 2
+      result.each do |player|
+        expect(player).to be_an_instance_of Player
+      end
     end
   end
 
