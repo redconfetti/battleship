@@ -57,6 +57,10 @@ gem "foreman"
 # https://github.com/redis/redis-rb
 gem 'redis', '~>3.2'
 
+# Ruby Web Server Built For Concurrency
+# https://github.com/puma/puma
+gem 'puma'
+
 group :production, :staging do
   gem "rails_12factor"
   gem "rails_stdout_logging"
