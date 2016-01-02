@@ -25,21 +25,26 @@
   <div class="panel-body">
     <div data-ng-if="pendingGames.other.length > 0">
       <p>The following games are awaiting a second player. Choose to join any of the following:</p>
+      <br>
+      <div class="row">
+        <div class="col-md-4">
+          <table class="table">
+            <tr>
+              <th>Start Date</th>
+              <th>&nbsp;</th>
+            </tr>
+            <tr data-ng-repeat="game in pendingGames.other">
+              <td>
+                <span data-ng-bind="game.startDate"></span>
+              </td>
+              <td>
+                <a class="btn btn-primary btn-xs" data-ng-click="">Join Game</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
 
-      <table class="table">
-        <tr>
-          <th>Start Date</th>
-          <th>&nbsp;</th>
-        </tr>
-        <tr data-ng-repeat="game in pendingGames.other">
-          <td>
-            <span data-ng-bind="game.startDate"></span>
-          </td>
-          <td>
-            <a class="btn btn-primary" data-ng-href="/#/play/{{game.id}}">Join Game</a>
-          </td>
-        </tr>
-      </table>
     </div>
 
     <div data-ng-if="pendingGames.other.length === 0">
