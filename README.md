@@ -28,7 +28,8 @@ See [Battleship game](https://en.wikipedia.org/wiki/Battleship_%28game%29) for f
 4. Use `bundle install` to install RubyGem dependencies
 5. Use `brew install node` to install NodeJS / Node Package Manager (NPM)
 6. Use `npm install -g bower` to globally install Bower
-7. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
+7. Use `brew install redis` to install Redis
+8. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
 
 ## Bower
 
@@ -53,6 +54,24 @@ $ heroku create
 
 # Deploy Changes
 $ git push heroku master
+
+# Activate Redis Add-on for Heroku (Hobby-Dev - No Charge)
+$ heroku addons:create heroku-redis:hobby-dev
+
+# Install the Redis CLI Plugin
+$ heroku plugins:install heroku-redis
+
+# Check if Redis Add-on is provisioned
+$ heroku addons | grep REDIS
+
+# View Redis server config
+$ heroku config | grep REDIS
+```
+
+This application connects to Redis using an environment variable 'REDISTOGO_URL'. You'll need to define this in your environment before running the Rails server locally.
+
+```
+$ ENV["REDISTOGO_URL"] = 'redis://username:password@my.host:6389'
 ```
 
 ## Log
