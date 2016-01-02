@@ -1,1 +1,61 @@
-<h4>Play</h4>
+<div class="alert alert-danger" role="alert" data-ng-if="displayError">
+  <span data-ng-bind="displayError"></span>
+</div>
+
+<div class="container-fluid" data-ng-hide="displayError">
+  <div class="row">
+
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Your Ships</h3>
+        </div>
+        <div class="panel-body">
+          
+          <table class="grid battle-grid">
+            <tr data-ng-repeat="battleGridRow in playerGameState.battle_grid">
+              <td data-ng-repeat="battleCell in battleGridRow track by $index" data-ng-class="gridSpaceStyle(battleCell)">
+                <div class="grid-spacer"></div>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Enemy Ships
+            <span class="label label-success" data-ng-if="turnEnabled">Take Shot</span>
+            <span class="label label-danger" data-ng-if="!turnEnabled">Awaiting Enemy Shot</span>
+          </h3>
+        </div>
+        <div class="panel-body">
+
+          <table class="grid tracking-grid">
+            <tr data-ng-repeat="trackingGridRow in playerGameState.tracking_grid">
+              <td data-ng-repeat="trackingCell in trackingGridRow track by $index">
+                <button class="grid-space-button" data-ng-click="takeShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!turnEnabled"></button>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <h4>
+        Status
+      </h4>      
+      <p>
+        <button data-ng-click="turnEnabled = !turnEnabled">Toggle</button>
+      </p>
+    </div>
+
+  </div>
+</div>
+
