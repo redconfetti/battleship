@@ -1,7 +1,8 @@
 class Game < ActiveRecord::Base
   scope :pending, -> { where(status: 'pending') }
 
-  has_many :player_game_states
+  has_many :player_game_states, dependent: :destroy
+  has_many :players, through: :player_game_states
 
   def self.create_with_associated_player(player)
     game = Game.create
@@ -15,4 +16,9 @@ class Game < ActiveRecord::Base
       'startDateUnixTimestamp' => self.created_at.to_i
     })
   end
+
+  def complete
+    update(status: 'complete')
+  end
+
 end

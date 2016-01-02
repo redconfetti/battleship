@@ -30,6 +30,7 @@ angular.module('battleship').controller('LoginController', ['$rootScope', '$scop
 
     Auth.logout(config).then(function(oldUser) {
       $rootScope.isAuthenticated = Auth.isAuthenticated();
+      $window.location.href = '/';
     }, function(error) {
       // console.log('error logging out of session');
       console.log(error);

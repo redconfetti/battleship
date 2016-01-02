@@ -24,4 +24,5 @@
 //= require controllers/gameController
 //= require controllers/homeController
 //= require controllers/loginController
+//= require controllers/playController
 //= require controllers/registrationController

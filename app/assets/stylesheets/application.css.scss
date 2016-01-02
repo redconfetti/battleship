@@ -22,3 +22,51 @@ body {
   padding-top: 70px;
   padding-bottom: 20px;
 }
+
+.grid {
+  tr {
+    padding: 0;
+    margin: 0;
+  }
+  td {
+    border: #000 solid 1px;
+    padding: 0px;
+    margin: 0px;
+  }
+  .grid-space-water {
+    background-color: #3cf;
+  }
+  .grid-space-ship {
+    background-color: #330;
+  }
+  .grid-space-hit {
+    background-color: #c30;
+  }
+  .grid-spacer {
+    height: 30px;
+    width: 30px;
+  }
+  button.grid-space-button {
+    &:hover {
+      outline: #f90 solid 3px;
+    }
+
+    &:focus {
+      outline: #800 solid 3px;
+    }
+    border: 0;
+    
+    display: block;
+    margin: 0;
+    height: 30px;
+    width: 30px;
+  }
+}
+
+.tracking-grid {
+  
+}
+
+.battle-grid {
+  
+}

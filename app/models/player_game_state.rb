@@ -8,6 +8,7 @@ class PlayerGameState < ActiveRecord::Base
   serialize :tracking_grid, Array
 
   before_create :init_grids
+  before_create :build_battle_grid
 
   # grid states
   # w = water
@@ -111,14 +112,27 @@ class PlayerGameState < ActiveRecord::Base
     false
   end
 
-  # Used to iterate over all grid positions
+  # Used to iterate and modify all grid positions
   def grid_map!(grid_type, &block)
     (0..9).to_a.each do |x|
       (0..9).to_a.each do |y|
         yield(battle_grid, x,y) if grid_type == 'battle'
-        yield(battle_grid, x,y) if grid_type == 'tracking'
+        yield(tracking_grid, x,y) if grid_type == 'tracking'
       end
     end
+  end
+
+  # Used to collect matching grid sets
+  def grid_collect(grid_type, &block)
+    collection = []
+    (0..9).to_a.each do |x|
+      (0..9).to_a.each do |y|
+        result = yield(battle_grid, x,y) if grid_type == 'battle'
+        result = yield(tracking_grid, x,y) if grid_type == 'tracking'
+        collection << result if result
+      end
+    end
+    collection
   end
 
   # Displays battle grid in console for human verification (and warm fuzzies)
