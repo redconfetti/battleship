@@ -68,12 +68,6 @@ $ heroku addons | grep REDIS
 $ heroku config | grep REDIS
 ```
 
-This application connects to Redis using an environment variable 'REDISTOGO_URL'. You'll need to define this in your environment before running the Rails server locally.
-
-```
-$ ENV["REDISTOGO_URL"] = 'redis://username:password@my.host:6389'
-```
-
 ## Log
 
 * Analyzed specifications and developed design (models and relationships)
