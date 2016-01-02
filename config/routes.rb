@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :games, only: [:index, :show, :create] do
     get 'pending', on: :collection
     put 'end', on: :member
+    put 'join', on: :member
   end
 
   # Example of regular route:

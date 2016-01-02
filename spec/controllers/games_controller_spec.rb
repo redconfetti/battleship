@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
   let(:game_with_players)   { create(:game_with_players) }
+  let(:player3)             { create(:player3) }
 
   before :each do
     request.env['HTTP_ACCEPT'] = 'application/json'
@@ -93,11 +94,38 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe 'PUT #end' do
+    it 'returns error if user not in game' do
+      game_with_players.player_game_states[0].destroy
+      put :end, id: game_with_players.id
+      expect(response).to have_http_status(:forbidden)
+      json_response = JSON.parse(response.body)
+      expect(json_response['error']).to eq "Only players in the game may end the game"
+    end
+
     it 'completes game' do
       put :end, id: game_with_players.id
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
       expect(json_response['status']).to eq 'complete'
+    end
+  end
+
+  describe 'PUT #join' do
+    it 'returns error if game does not have space for another player' do
+      game_with_players.player_game_states[0].destroy # remove self from game
+      game_with_players.add_player(player3) # add player3 as second player
+      put :join, id: game_with_players.id
+      expect(response).to have_http_status(:forbidden)
+      json_response = JSON.parse(response.body)
+      expect(json_response['error']).to eq "This game already has 2 players"
+    end
+
+    it 'adds player to game' do
+      game_with_players.player_game_states[0].destroy # remove self from game
+      put :join, id: game_with_players.id
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      puts "json_response: #{json_response.inspect}"
     end
   end
 
