@@ -48,15 +48,8 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#is_player?' do
-    it 'returns true if player associated with game' do
-      expect(game_with_players.is_player?(player2)).to eq true
-    end
-
-    it 'returns false if player not associated with game' do
-      expect(game_with_players.is_player?(player3)).to eq false
-    end
-  end
+  #####################
+  # Associations
 
   describe '#current_player' do
     it 'returns nil when no current player' do
@@ -68,6 +61,51 @@ RSpec.describe Game, type: :model do
       expect(game.current_player).to eq player1
     end
   end
+
+  describe '#player_state' do
+    it 'raises exception if player state not present' do
+      expect { game_with_players.player_state(player3) }.to raise_error(ArgumentError, "Player #{player3.id} is not present in this game")
+    end
+
+    it 'returns player state for player' do
+      game.add_player(player1)
+      result = game.player_state(player1)
+      expect(result).to be_an_instance_of PlayerGameState
+      expect(result.player_id).to eq player1.id
+    end
+  end
+
+  #####################
+  # State Checks
+
+  describe '#is_player?' do
+    it 'returns true if player associated with game' do
+      expect(game_with_players.is_player?(player2)).to eq true
+    end
+
+    it 'returns false if player not associated with game' do
+      expect(game_with_players.is_player?(player3)).to eq false
+    end
+  end
+
+  describe '#is_turn?' do
+    it 'returns true when it is players turn' do
+      game.add_player(player1)
+      expect(game.is_turn? player1).to eq true
+    end
+
+    it 'returns false when it is not players turn' do
+      game.add_player(player1)
+      expect(game.is_turn? player2).to eq false
+    end
+
+    it 'returns false when no current player' do
+      expect(game.is_turn? player1).to eq false
+    end
+  end
+
+  #####################
+  # Actions
 
   describe '#add_player' do
     it 'adds player to game' do

@@ -17,13 +17,33 @@ class Game < ActiveRecord::Base
     })
   end
 
-  def is_player?(player)
-    players.include?(player)
-  end
+  #####################
+  # Associations
 
   def current_player
     Player.where(id: current_player_id).first
   end
+
+  def player_state(player)
+    state = player_game_states.where(player_id: player.id).first
+    raise ArgumentError, "Player #{player.id} is not present in this game" unless state
+    state
+  end
+
+  #####################
+  # State Checks
+
+  def is_player?(player)
+    player_game_states.exists?(player_id: player.id)
+  end
+
+  def is_turn?(player)
+    return false unless current = current_player
+    current.id == player.id
+  end
+
+  #####################
+  # Actions
 
   def add_player(player)
     player_game_states.create(player: player)
