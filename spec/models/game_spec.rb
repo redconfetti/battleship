@@ -104,6 +104,17 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  # describe '#is_complete?' do
+  #   context 'when all of a players ship spaces are hit' do
+  #     it 'returns true'
+  #     it 'updates game status as completed'
+  #   end
+  #
+  #   context 'when either player still has ship spaces' do
+  #     it 'returns false'
+  #   end
+  # end
+
   #####################
   # Actions
 
@@ -146,5 +157,28 @@ RSpec.describe Game, type: :model do
       expect(subject.reload.status).to eq 'complete'
     end
   end
+
+  # describe '#take_shot' do
+  #   it 'raises exception if not opposing players turn'
+  #   context 'when registering shot in current players game state' do
+  #     context 'when shot was a miss' do
+  #       it 'registers a miss on tracking grid'
+  #     end
+  #
+  #     context 'when shot was a hit' do
+  #       it 'registers a hit on tracking grid'
+  #     end
+  #   end
+  #   context 'when registering shot in enemy players game state' do
+  #     context 'when shot was a miss' do
+  #       it 'registers a miss on enemy players battle grid'
+  #     end
+  #
+  #     context 'when shot was a hit' do
+  #       it 'registers a hit on enemy players battle grid'
+  #     end
+  #   end
+  #
+  # end
 
 end
