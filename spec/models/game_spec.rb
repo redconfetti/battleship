@@ -1,11 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
-  let(:player1)           { create(:player1) }
+  let(:game)              { create(:game) }
   let(:game_with_players) { create(:game_with_players) }
-  subject                 { create(:game) }
+  let(:player1)           { game_with_players.players[0] }
+  let(:player2)           { game_with_players.players[1] }
+  let(:player3)           { create(:player3) }
+  subject                 { game_with_players }
 
   describe '.create_with_associated_player' do
+    let(:player1) { create(:player1) }
     it 'creates game with specified player associated' do
       result = Game.create_with_associated_player(player1)
       player_game_states = result.player_game_states
@@ -18,7 +22,7 @@ RSpec.describe Game, type: :model do
 
   describe '#players' do
     it 'returns players associated through PlayerGameStates' do
-      result = game_with_players.players
+      result = subject.players
       expect(result).to be_an_instance_of Player::ActiveRecord_Associations_CollectionProxy
       expect(result.count).to eq 2
       result.each do |player|
@@ -50,4 +54,35 @@ RSpec.describe Game, type: :model do
       expect(subject.reload.status).to eq 'complete'
     end
   end
+
+  describe '#add_player' do
+    it 'adds player to game' do
+      game.add_player(player1)
+      players = game.reload.players
+      expect(players.count).to eq 1
+      expect(players[0]).to eq player1
+    end
+
+    it 'does not update status after first player joined' do
+      game.add_player(player1)
+      expect(game.status).to eq 'pending'
+    end
+
+    it 'updates status after second player joined' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.status).to eq 'playing'
+    end
+  end
+
+  describe '#is_player?' do
+    it 'returns true if player associated with game' do
+      expect(game_with_players.is_player?(player2)).to eq true
+    end
+
+    it 'returns false if player not associated with game' do
+      expect(game_with_players.is_player?(player3)).to eq false
+    end
+  end
+
 end
