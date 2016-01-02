@@ -25,7 +25,6 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
   };
 
   $scope.endPlayerGame = function() {
-    // $scope.currentPlayerGame;
     $http({
       method: 'PUT',
       url: '/games/'+ $scope.currentPlayerGame.id + '/end.json'
