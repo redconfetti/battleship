@@ -28,15 +28,15 @@
 
       <table class="table">
         <tr>
-          <th>Status</th>
           <th>Start Date</th>
+          <th>&nbsp;</th>
         </tr>
         <tr data-ng-repeat="game in pendingGames.other">
           <td>
-            <span data-ng-bind="game.status"></span>
+            <span data-ng-bind="game.startDate"></span>
           </td>
           <td>
-            <span data-ng-bind="game.startDate"></span>
+            <a class="btn btn-primary" data-ng-href="/#/play/{{game.id}}">Join Game</a>
           </td>
         </tr>
       </table>
