@@ -48,10 +48,9 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
           setCurrentGame($scope.pendingGames.player[0]);
         }
       }, function(error) {
-        $scope.displayError = 'Unable to obtain current user';
+        $scope.displayError = 'Unable to load user profile';
       });
     }, function errorCallback(response) {
-      $scope.pendingGamesError = true;
       $scope.displayError = 'Unable to retrieve pending games list';
     });
   };
