@@ -4,24 +4,24 @@ RSpec.describe GamesController, type: :controller do
   let(:game_with_players)   { create(:game_with_players) }
 
   before :each do
-    request.env["HTTP_ACCEPT"] = 'application/json'
+    request.env['HTTP_ACCEPT'] = 'application/json'
     sign_in game_with_players.player_game_states[0].player
   end
 
-  describe "GET #index" do
-    it "returns http success" do
+  describe 'GET #index' do
+    it 'returns http success' do
       get :index
       expect(response).to have_http_status(:success)
     end
   end
 
-  describe "GET #pending" do
-    it "returns http success" do
+  describe 'GET #pending' do
+    it 'returns http success' do
       get :pending
       expect(response).to have_http_status(:success)
     end
 
-    it "includes player game states" do
+    it 'includes player game states' do
       get :pending
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
@@ -40,8 +40,40 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
-  describe "POST #create" do
-    it "creates new game with current player associated" do
+  describe 'GET #show' do
+    it 'returns game' do
+      get :show, id: game_with_players.id
+      expect(response).to have_http_status(:success)
+      game = JSON.parse(response.body)
+      expect(game).to be_an_instance_of Hash
+      expect(game['id']).to eq game_with_players.id
+    end
+
+    it 'includes associated player game states' do
+      get :show, id: game_with_players.id
+      game = JSON.parse(response.body)
+      expect(game).to be_an_instance_of Hash
+      player_game_states = game['player_game_states']
+      expect(player_game_states).to be_an_instance_of Array
+      player_game_states.each do |game_state|
+        expect(game_state['battle_grid']).to be_an_instance_of Array
+        expect(game_state['tracking_grid']).to be_an_instance_of Array
+      end
+    end
+
+    it 'associated player game states include players' do
+      get :show, id: game_with_players.id
+      game = JSON.parse(response.body)
+      player_game_states = game['player_game_states']
+      player_game_states.each do |game_state|
+        expect(game_state['player']).to be_an_instance_of Hash
+        expect(game_state['player']['id']).to be_an_instance_of Fixnum
+      end
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates new game with current player associated' do
       post :create
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
@@ -60,12 +92,13 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
-  describe "PUT #end" do
-    it "completes game" do
+  describe 'PUT #end' do
+    it 'completes game' do
       put :end, id: game_with_players.id
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
       expect(json_response['status']).to eq 'complete'
     end
   end
+
 end

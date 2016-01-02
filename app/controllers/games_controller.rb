@@ -17,6 +17,19 @@ class GamesController < ApplicationController
     end
   end
 
+  # GET /games/:id.json
+  def show
+    game = Game.includes(player_game_states: [:player]).find(params[:id])
+    game_associations = {
+      :player_game_states => {
+        :include=> :player
+      }
+    }
+    respond_to do |format|
+      format.json { render json: game.to_json(:include => game_associations) }
+    end
+  end
+
   # POST /games.json
   def create
     new_game = Game.create_with_associated_player(current_player)
@@ -25,7 +38,7 @@ class GamesController < ApplicationController
     end
   end
 
-  # PUT /games/:id/end
+  # PUT /games/:id/end.json
   def end
     game = Game.find(params[:id])
     game.complete
