@@ -24,17 +24,6 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
     $scope.currentPlayerGame.playPath = '/#/play/' + game.id;
   };
 
-  $scope.endPlayerGame = function() {
-    $http({
-      method: 'PUT',
-      url: '/games/'+ $scope.currentPlayerGame.id + '/end.json'
-    }).then(function successCallback(response) {
-      $scope.getPendingGames();
-    }, function errorCallback(response) {
-      $scope.displayError = 'Error ending current game';
-    });
-  };
-
   $scope.getPendingGames = function() {
     $http({
       method: 'GET',
@@ -63,6 +52,29 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
       $window.location.href = $scope.currentPlayerGame.playPath;
     }, function errorCallback(response) {
       $scope.displayError = 'Error creating new game';
+    });
+  };
+
+  $scope.joinGame = function(game) {
+    $http({
+      method: 'PUT',
+      url: '/games/' + game.id + '/join.json'
+    }).then(function successCallback(response) {
+      setCurrentGame(response.data);
+      $window.location.href = $scope.currentPlayerGame.playPath;
+    }, function errorCallback(response) {
+      $scope.displayError = 'Error creating new game';
+    });
+  };
+
+  $scope.endPlayerGame = function() {
+    $http({
+      method: 'PUT',
+      url: '/games/'+ $scope.currentPlayerGame.id + '/end.json'
+    }).then(function successCallback(response) {
+      $scope.getPendingGames();
+    }, function errorCallback(response) {
+      $scope.displayError = 'Error ending current game';
     });
   };
 
