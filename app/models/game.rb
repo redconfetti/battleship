@@ -17,16 +17,22 @@ class Game < ActiveRecord::Base
     })
   end
 
-  def complete
-    update(status: 'complete')
-  end
-
   def is_player?(player)
     players.include?(player)
+  end
+
+  def current_player
+    Player.where(id: current_player_id).first
   end
 
   def add_player(player)
     player_game_states.create(player: player)
     update(status: 'playing') if players.count == 2
+    update(current_player_id: player.id) if current_player == nil
   end
+
+  def complete
+    update(status: 'complete')
+  end
+
 end

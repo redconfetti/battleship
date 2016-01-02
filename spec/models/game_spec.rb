@@ -48,10 +48,24 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#complete' do
-    it 'updates game status as complete' do
-      subject.complete
-      expect(subject.reload.status).to eq 'complete'
+  describe '#is_player?' do
+    it 'returns true if player associated with game' do
+      expect(game_with_players.is_player?(player2)).to eq true
+    end
+
+    it 'returns false if player not associated with game' do
+      expect(game_with_players.is_player?(player3)).to eq false
+    end
+  end
+
+  describe '#current_player' do
+    it 'returns nil when no current player' do
+      expect(game.current_player).to eq nil
+    end
+
+    it 'returns player when current player' do
+      game.update(current_player_id: player1.id)
+      expect(game.current_player).to eq player1
     end
   end
 
@@ -73,15 +87,25 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       expect(game.status).to eq 'playing'
     end
-  end
 
-  describe '#is_player?' do
-    it 'returns true if player associated with game' do
-      expect(game_with_players.is_player?(player2)).to eq true
+    it 'sets current player when not set' do
+      expect(game.current_player).to be nil
+      game.add_player(player1)
+      expect(game.current_player).to eq player1
     end
 
-    it 'returns false if player not associated with game' do
-      expect(game_with_players.is_player?(player3)).to eq false
+    it 'leaves current player when already set' do
+      game.add_player(player1)
+      expect(game.current_player).to eq player1
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+    end
+  end
+
+  describe '#complete' do
+    it 'updates game status as complete' do
+      subject.complete
+      expect(subject.reload.status).to eq 'complete'
     end
   end
 
