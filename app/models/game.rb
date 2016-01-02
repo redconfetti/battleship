@@ -21,4 +21,7 @@ class Game < ActiveRecord::Base
     update(status: 'complete')
   end
 
+  def is_player?(player)
+    players.include?(player)
+  end
 end
