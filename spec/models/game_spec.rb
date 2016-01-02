@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
+  let(:game)              { create(:game) }
   let(:game_with_players) { create(:game_with_players) }
   let(:player1)           { game_with_players.players[0] }
   let(:player2)           { game_with_players.players[1] }
@@ -51,6 +52,26 @@ RSpec.describe Game, type: :model do
     it 'updates game status as complete' do
       subject.complete
       expect(subject.reload.status).to eq 'complete'
+    end
+  end
+
+  describe '#add_player' do
+    it 'adds player to game' do
+      game.add_player(player1)
+      players = game.reload.players
+      expect(players.count).to eq 1
+      expect(players[0]).to eq player1
+    end
+
+    it 'does not update status after first player joined' do
+      game.add_player(player1)
+      expect(game.status).to eq 'pending'
+    end
+
+    it 'updates status after second player joined' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.status).to eq 'playing'
     end
   end
 

@@ -6,7 +6,7 @@ class Game < ActiveRecord::Base
 
   def self.create_with_associated_player(player)
     game = Game.create
-    game.player_game_states.create(player: player)
+    game.add_player(player)
     game
   end
 
@@ -23,5 +23,10 @@ class Game < ActiveRecord::Base
 
   def is_player?(player)
     players.include?(player)
+  end
+
+  def add_player(player)
+    player_game_states.create(player: player)
+    update(status: 'playing') if players.count == 2
   end
 end
