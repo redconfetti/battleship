@@ -9,11 +9,11 @@ class GamesController < ApplicationController
     end
   end
 
-  # GET /games/pending.json
-  def pending
-    pending_games = Game.includes(:player_game_states).pending
+  # GET /games/incomplete.json
+  def incomplete
+    incomplete_games = Game.includes(:player_game_states).incomplete
     respond_to do |format|
-      format.json { render json: pending_games.to_json(:include => :player_game_states) }
+      format.json { render json: incomplete_games.to_json(:include => :player_game_states) }
     end
   end
 

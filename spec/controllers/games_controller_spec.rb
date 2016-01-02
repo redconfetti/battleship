@@ -16,14 +16,14 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
-  describe 'GET #pending' do
+  describe 'GET #incomplete' do
     it 'returns http success' do
-      get :pending
+      get :incomplete
       expect(response).to have_http_status(:success)
     end
 
     it 'includes player game states' do
-      get :pending
+      get :incomplete
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Array

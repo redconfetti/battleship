@@ -1,5 +1,5 @@
 class Game < ActiveRecord::Base
-  scope :pending, -> { where(status: 'pending') }
+  scope :incomplete, -> { where.not(status: 'complete') }
 
   has_many :player_game_states, dependent: :destroy
   has_many :players, through: :player_game_states

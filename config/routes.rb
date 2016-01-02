@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   root 'home#index'
 
   resources :games, only: [:index, :show, :create] do
-    get 'pending', on: :collection
+    get 'incomplete', on: :collection
     put 'end', on: :member
     put 'join', on: :member
   end
