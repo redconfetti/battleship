@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Player, type: :model do
   let(:game_with_players)   { create(:game_with_players) }
-  subject                   { game_with_players.player_game_states[0].player }
+  subject                   { game_with_players.players[0] }
 
   describe '#active_game' do
     it 'returns players active game' do
