@@ -53,6 +53,10 @@ gem 'sprockets', '2.12.3'
 # Manage Procfile-based applications
 gem "foreman"
 
+# Ruby client library for Redis
+# https://github.com/redis/redis-rb
+gem 'redis', '~>3.2'
+
 group :production, :staging do
   gem "rails_12factor"
   gem "rails_stdout_logging"
