@@ -37,5 +37,8 @@ module Battleship
       g.stylesheets     false
       g.javascripts     false
     end
+
+    # Add folders to autoload
+    config.autoload_paths << Rails.root.join('lib')
   end
 end
