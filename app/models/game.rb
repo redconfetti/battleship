@@ -24,6 +24,11 @@ class Game < ActiveRecord::Base
     Player.where(id: current_player_id).first
   end
 
+  def current_target
+    return nil unless current_player
+    players.where.not(id: current_player.id).first
+  end
+
   def player_state(player)
     state = player_game_states.where(player_id: player.id).first
     raise ArgumentError, "Player #{player.id} is not present in this game" unless state

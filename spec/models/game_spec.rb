@@ -56,8 +56,25 @@ RSpec.describe Game, type: :model do
     end
 
     it 'returns player when current player' do
-      game.update(current_player_id: player1.id)
+      game.add_player(player1)
       expect(game.current_player).to eq player1
+    end
+  end
+
+  describe '#current_target' do
+    it 'returns nil when no current player' do
+      expect(game.current_target).to eq nil
+    end
+
+    it 'returns nil when no second player' do
+      game.add_player(player1)
+      expect(game.current_target).to eq nil
+    end
+
+    it 'returns player open for attack for current turn' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_target).to eq player2
     end
   end
 
