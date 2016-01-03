@@ -28,8 +28,19 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     return styles;
   }
 
-  $scope.takeShot = function(x,y) {
-    console.log('x: ' + x + ', y: ' + y);
+  $scope.fireShot = function() {
+    $http({
+      method: 'PUT',
+      url: '/games/'+ $routeParams.gameId + '/fire.json',
+      data: {
+        x: 0,
+        y: 0
+      }
+    }).then(function successCallback(response) {
+      console.log(response.data);
+    }, function errorCallback(response) {
+      $scope.displayError = 'Error firing shot';
+    });
   };
 
   $scope.loadPlayerGameState = function() {
@@ -54,4 +65,5 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   $scope.loadPlayerGameState();
+
 }]);
