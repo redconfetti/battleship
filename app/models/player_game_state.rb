@@ -34,13 +34,6 @@ class PlayerGameState < ActiveRecord::Base
   end
 
   ###########################
-  # Channel Communication
-
-  def channel_name
-    "game#{game.id}-player#{player.id}"
-  end
-
-  ###########################
   # Grid Generation
 
   def init_grids

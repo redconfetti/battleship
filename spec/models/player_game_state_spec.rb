@@ -88,16 +88,6 @@ RSpec.describe PlayerGameState, type: :model do
     end
   end
 
-  describe 'channel communication' do
-
-    describe '#channel_name' do
-      it 'returns channel name' do
-        expect(subject.channel_name).to eq "game#{game.id}-player#{player.id}"
-      end
-    end
-
-  end
-
   describe 'grid generation' do
     before { subject.init_grids }
 
