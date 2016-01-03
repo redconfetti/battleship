@@ -59,7 +59,7 @@ class GamesController < ApplicationController
     end
   end
 
-  # PUT /player_game_states/:id/fire.json
+  # PUT /games/:id/fire.json
   def fire
     game = Game.find(params[:id])
     raise Exceptions::Forbidden, "It is not your turn" unless game.is_turn?(current_player)
