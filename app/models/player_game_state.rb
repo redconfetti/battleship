@@ -40,10 +40,6 @@ class PlayerGameState < ActiveRecord::Base
     "game#{game.id}-player#{player.id}"
   end
 
-  def publish_update
-    REDIS.publish(channel_name, to_json)
-  end
-
   ###########################
   # Grid Generation
 

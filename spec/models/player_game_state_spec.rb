@@ -96,17 +96,6 @@ RSpec.describe PlayerGameState, type: :model do
       end
     end
 
-    describe '#publish_update' do
-      it 'publishes json to channel' do
-        mock_json = {:test => '123'}.to_json
-        allow(subject).to receive(:to_json).and_return(mock_json)
-        game_id = game.id
-        player_id = player.id
-        expect(REDIS).to receive(:publish).with("game#{game.id}-player#{player.id}", mock_json)
-        subject.publish_update
-      end
-    end
-
   end
 
   describe 'grid generation' do
