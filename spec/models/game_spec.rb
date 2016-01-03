@@ -167,6 +167,16 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  describe '#end_current_turn' do
+    it 'switches current player' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+      game.end_current_turn
+      expect(game.reload.current_player).to eq player2
+    end
+  end
+
   describe '#complete' do
     it 'updates game status as complete' do
       subject.complete
