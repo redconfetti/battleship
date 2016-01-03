@@ -2,41 +2,69 @@ require 'rails_helper'
 require 'set'
 
 RSpec.describe PlayerGameState, type: :model do
+  let(:player_game_state)   { create(:player_game_state) }
+  let(:game)                { player_game_state.game }
+  let(:player)              { player_game_state.player }
   let(:player2)             { create(:player2) }
   let(:player3)             { create(:player3) }
-  let(:game_with_player)    { create(:game_with_player) }
-  let(:game_with_players)   { create(:game_with_players) }
-  subject { create(:game_with_player).player_game_states[0] }
+  subject                   { player_game_state }
 
   describe ".for_game" do
     it 'returns PlayerGameStates for game' do
-      result = PlayerGameState.for_game(game_with_players)
+      game.add_player(player2)
+      result = PlayerGameState.for_game(game)
       expect(result).to be_an_instance_of PlayerGameState::ActiveRecord_Relation
       expect(result.count).to eq 2
     end
   end
 
-  it 'belongs to game' do
-    result = subject.game
-    expect(result).to be_an_instance_of Game
-    expect(result.created_at).to eq '2015-01-26 04:15:32'
+  describe '#as_json' do
+    it 'returns json representation' do
+      expect(subject.as_json).to be_an_instance_of Hash
+    end
+
+    it 'includes game' do
+      result = subject.as_json
+      expect(result['game']).to be_an_instance_of Hash
+      expect(result['game']['id']).to eq subject.game_id
+    end
+
+    it 'includes player' do
+      result = subject.as_json
+      expect(result['player']).to be_an_instance_of Hash
+      expect(result['player']['id']).to eq subject.player_id
+    end
+
+    it 'includes pusher key' do
+      result = subject.as_json
+      expect(result['pusherKey']).to eq Pusher.key
+    end
   end
 
-  it 'belongs to player' do
-    result = subject.player
-    expect(result).to be_an_instance_of Player
-    expect(result.email).to eq 'johndoe@example.com'
+  describe 'associations' do
+    it 'belongs to game' do
+      result = subject.game
+      expect(result).to be_an_instance_of Game
+      expect(result.created_at).to eq '2015-01-26 04:15:32'
+    end
+
+    it 'belongs to player' do
+      result = subject.player
+      expect(result).to be_an_instance_of Player
+      expect(result.email).to eq 'johndoe@example.com'
+    end
   end
 
   describe 'validations' do
     it 'allows second player in game' do
-      player2_game_state = PlayerGameState.new(game: game_with_player, player: player2)
+      player2_game_state = PlayerGameState.new(game: game, player: player2)
       expect(player2_game_state.valid?).to eq true
       expect(player2_game_state.errors).to_not have_key(:game)
     end
 
     it 'prevents more than two players in game' do
-      player3_game_state = PlayerGameState.new(game: game_with_players, player: player3)
+      game.add_player(player2)
+      player3_game_state = PlayerGameState.new(game: game, player: player3)
       expect(player3_game_state.valid?).to eq false
       expect(player3_game_state.errors).to have_key(:game)
     end
@@ -65,7 +93,7 @@ RSpec.describe PlayerGameState, type: :model do
     end
   end
 
-  describe 'battlegrid generation' do
+  describe 'grid generation' do
     before { subject.init_grids }
 
     describe '#available_placements' do

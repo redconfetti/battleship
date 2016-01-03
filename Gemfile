@@ -53,6 +53,14 @@ gem 'sprockets', '2.12.3'
 # Manage Procfile-based applications
 gem "foreman"
 
+# Ruby Web Server Built For Concurrency
+# https://github.com/puma/puma
+gem 'puma'
+
+# Ruby library for the Pusher API
+# https://github.com/pusher/pusher-http-ruby
+gem 'pusher'
+
 group :production, :staging do
   gem "rails_12factor"
   gem "rails_stdout_logging"

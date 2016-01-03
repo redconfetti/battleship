@@ -28,6 +28,16 @@ class PlayerGameState < ActiveRecord::Base
     end
   end
 
+  def as_json(options = {})
+    options[:include] = [:game, :player]
+    super(options).merge({
+      'pusherKey' => Pusher.key
+    })      
+  end
+
+  ###########################
+  # Grid Generation
+
   def init_grids
     grid = []
     (0..9).to_a.each do |x|

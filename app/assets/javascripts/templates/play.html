@@ -29,8 +29,8 @@
         <div class="panel-heading">
           <h3 class="panel-title">
             Enemy Ships
-            <span class="label label-success" data-ng-if="turnEnabled">Take Shot</span>
-            <span class="label label-danger" data-ng-if="!turnEnabled">Awaiting Enemy Shot</span>
+            <span class="label label-success" data-ng-if="isCurrentTurn()">Take Shot</span>
+            <span class="label label-danger" data-ng-if="!isCurrentTurn()">Awaiting Enemy Shot</span>
           </h3>
         </div>
         <div class="panel-body">
@@ -38,7 +38,7 @@
           <table class="grid tracking-grid">
             <tr data-ng-repeat="trackingGridRow in playerGameState.tracking_grid">
               <td data-ng-repeat="trackingCell in trackingGridRow track by $index">
-                <button class="grid-space-button" data-ng-click="takeShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!turnEnabled"></button>
+                <button class="grid-space-button" data-ng-click="fireShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!isCurrentTurn()"></button>
               </td>
             </tr>
           </table>
@@ -51,9 +51,6 @@
       <h4>
         Status
       </h4>      
-      <p>
-        <button data-ng-click="turnEnabled = !turnEnabled">Toggle</button>
-      </p>
     </div>
 
   </div>

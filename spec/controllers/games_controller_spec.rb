@@ -1,12 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
-  let(:game_with_players)   { create(:game_with_players) }
-  let(:player3)             { create(:player3) }
+  let(:game) { create(:game) }
+  let(:player1) { create(:player1) }
+  let(:player2) { create(:player2) }
+  let(:player3) { create(:player3) }
+  let(:game_with_players) { game.add_player(player1); game.add_player(player2); game }
+  let(:current_player) { game_with_players.player_game_states[0].player }
 
   before :each do
     request.env['HTTP_ACCEPT'] = 'application/json'
-    sign_in game_with_players.player_game_states[0].player
+    sign_in current_player
   end
 
   describe 'GET #index' do
@@ -42,34 +46,38 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe 'GET #show' do
-    it 'returns game' do
+    it 'provides current players game state' do
       get :show, id: game_with_players.id
       expect(response).to have_http_status(:success)
-      game = JSON.parse(response.body)
+      player_game_state = JSON.parse(response.body)
+      expect(player_game_state).to be_an_instance_of Hash
+      expect(player_game_state['player_id']).to eq current_player.id
+      expect(player_game_state['battle_grid']).to be_an_instance_of Array
+      expect(player_game_state['tracking_grid']).to be_an_instance_of Array
+    end
+
+    it 'includes associated game' do
+      get :show, id: game_with_players.id
+      player_game_state = JSON.parse(response.body)
+      expect(player_game_state).to be_an_instance_of Hash
+      game = player_game_state['game']
       expect(game).to be_an_instance_of Hash
       expect(game['id']).to eq game_with_players.id
     end
 
-    it 'includes associated player game states' do
+    it 'include associated player' do
       get :show, id: game_with_players.id
-      game = JSON.parse(response.body)
-      expect(game).to be_an_instance_of Hash
-      player_game_states = game['player_game_states']
-      expect(player_game_states).to be_an_instance_of Array
-      player_game_states.each do |game_state|
-        expect(game_state['battle_grid']).to be_an_instance_of Array
-        expect(game_state['tracking_grid']).to be_an_instance_of Array
-      end
+      player_game_state = JSON.parse(response.body)
+      expect(player_game_state).to be_an_instance_of Hash
+      player = player_game_state['player']
+      expect(player['id']).to eq current_player.id
     end
 
-    it 'associated player game states include players' do
+    it 'includes pusher key' do
       get :show, id: game_with_players.id
-      game = JSON.parse(response.body)
-      player_game_states = game['player_game_states']
-      player_game_states.each do |game_state|
-        expect(game_state['player']).to be_an_instance_of Hash
-        expect(game_state['player']['id']).to be_an_instance_of Fixnum
-      end
+      player_game_state = JSON.parse(response.body)
+      expect(player_game_state).to be_an_instance_of Hash
+      expect(player_game_state['pusherKey']).to eq Pusher.key
     end
   end
 
@@ -125,7 +133,22 @@ RSpec.describe GamesController, type: :controller do
       put :join, id: game_with_players.id
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
-      puts "json_response: #{json_response.inspect}"
+    end
+  end
+
+  describe 'PUT #fire' do
+    it 'returns error if not players turn' do
+      game.end_current_turn
+      put :fire, id: game_with_players.id, x: 2, y: 3
+      expect(response).to have_http_status(:forbidden)
+      json_response = JSON.parse(response.body)
+      expect(json_response['error']).to eq "It is not your turn"
+    end
+
+    it 'ends current turn' do
+      put :fire, id: game_with_players.id, x: 6, y: 8
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
     end
   end
 

@@ -33,8 +33,7 @@ RSpec.describe Game, type: :model do
 
   describe '#as_json' do
     it 'returns json representation' do
-      result = subject.as_json
-      expect(result).to be_an_instance_of Hash
+      expect(subject.as_json).to be_an_instance_of Hash
     end
 
     it 'includes start date in json' do
@@ -48,12 +47,91 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#complete' do
-    it 'updates game status as complete' do
-      subject.complete
-      expect(subject.reload.status).to eq 'complete'
+  #####################
+  # Associations
+
+  describe '#current_player' do
+    it 'returns nil when no current player' do
+      expect(game.current_player).to eq nil
+    end
+
+    it 'returns player when current player' do
+      game.add_player(player1)
+      expect(game.current_player).to eq player1
     end
   end
+
+  describe '#current_target' do
+    it 'returns nil when no current player' do
+      expect(game.current_target).to eq nil
+    end
+
+    it 'returns nil when no second player' do
+      game.add_player(player1)
+      expect(game.current_target).to eq nil
+    end
+
+    it 'returns player open for attack for current turn' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_target).to eq player2
+    end
+  end
+
+  describe '#player_state' do
+    it 'raises exception if player state not present' do
+      expect { game_with_players.player_state(player3) }.to raise_error(ArgumentError, "Player #{player3.id} is not present in this game")
+    end
+
+    it 'returns player state for player' do
+      game.add_player(player1)
+      result = game.player_state(player1)
+      expect(result).to be_an_instance_of PlayerGameState
+      expect(result.player_id).to eq player1.id
+    end
+  end
+
+  #####################
+  # Channel Communications
+
+  describe '#trigger_update' do
+    it 'sends update event notice to pusher' do
+      expect(Pusher).to receive(:trigger).with("game-#{subject.id}", 'updated', subject.to_json)
+      subject.trigger_update
+    end
+  end
+
+  #####################
+  # State Checks
+
+  describe '#is_player?' do
+    it 'returns true if player associated with game' do
+      expect(game_with_players.is_player?(player2)).to eq true
+    end
+
+    it 'returns false if player not associated with game' do
+      expect(game_with_players.is_player?(player3)).to eq false
+    end
+  end
+
+  describe '#is_turn?' do
+    it 'returns true when it is players turn' do
+      game.add_player(player1)
+      expect(game.is_turn? player1).to eq true
+    end
+
+    it 'returns false when it is not players turn' do
+      game.add_player(player1)
+      expect(game.is_turn? player2).to eq false
+    end
+
+    it 'returns false when no current player' do
+      expect(game.is_turn? player1).to eq false
+    end
+  end
+
+  #####################
+  # Actions
 
   describe '#add_player' do
     it 'adds player to game' do
@@ -73,15 +151,42 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       expect(game.status).to eq 'playing'
     end
-  end
 
-  describe '#is_player?' do
-    it 'returns true if player associated with game' do
-      expect(game_with_players.is_player?(player2)).to eq true
+    it 'sets current player when not set' do
+      expect(game.current_player).to be nil
+      game.add_player(player1)
+      expect(game.current_player).to eq player1
     end
 
-    it 'returns false if player not associated with game' do
-      expect(game_with_players.is_player?(player3)).to eq false
+    it 'leaves current player when already set' do
+      game.add_player(player1)
+      expect(game.current_player).to eq player1
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+    end
+  end
+
+  describe '#end_current_turn' do
+    it 'switches current player' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+      game.end_current_turn
+      expect(game.reload.current_player).to eq player2
+    end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update)
+      game.add_player(player1)
+      game.add_player(player2)
+      game.end_current_turn
+    end
+  end
+
+  describe '#complete' do
+    it 'updates game status as complete' do
+      subject.complete
+      expect(subject.reload.status).to eq 'complete'
     end
   end
 
