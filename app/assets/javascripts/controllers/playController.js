@@ -1,14 +1,45 @@
 angular.module('battleship').controller('PlayController', ['$http', '$routeParams', '$scope', 'Auth', function PlayController($http, $routeParams, $scope, Auth) {
 
-  // Returns PlayerGameState for current player
-  var findCurrentPlayerGameState = function(gameStates, currentUser) {
-    var currentPlayerGameState = null;
-    angular.forEach(gameStates, function(gameState) {
-      if (gameState.player_id === currentUser.id) {
-        currentPlayerGameState = gameState;
+  var pushListenerRegistered = false;
+
+  var loadPlayerGameState = function() {
+    $http({
+      method: 'GET',
+      url: '/games/'+ $routeParams.gameId + '.json'
+    }).then(function successCallback(response) {
+      $scope.playerGameState = response.data;
+      console.log($scope.playerGameState);
+      if (!pushListenerRegistered) {
+        registerPusherListener();
+        pushListenerRegistered = true;
       }
+    }, function errorCallback(response) {
+      $scope.displayError = 'Unable to load player game state';
     });
-    return currentPlayerGameState;
+  };
+
+  var registerPusherListener = function() {
+    // Enable pusher logging - don't include this in production
+    /*
+    Pusher.log = function(message) {
+      if (window.console && window.console.log) {
+        window.console.log(message);
+      }
+    };
+    */
+
+    var pusher = new Pusher($scope.playerGameState.pusherKey, {
+      encrypted: true
+    });
+    var channel = pusher.subscribe('game-' + $scope.playerGameState.game.id);
+    channel.bind('updated', loadPlayerGameState);
+  };
+
+  $scope.isCurrentTurn = function() {
+    if ($scope.playerGameState && $scope.playerGameState.game) {
+      return $scope.playerGameState.game.current_player_id === $scope.playerGameState.player_id;
+    }
+    return false;
   };
 
   // Specifies styles applied to grid spaces based on value
@@ -28,13 +59,14 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     return styles;
   }
 
-  $scope.fireShot = function() {
+  $scope.fireShot = function(xCoord, yCoord) {
+    console.log('shot fired at X: ' + xCoord + ', Y: ' + yCoord);
     $http({
       method: 'PUT',
       url: '/games/'+ $routeParams.gameId + '/fire.json',
       data: {
-        x: 0,
-        y: 0
+        x: xCoord,
+        y: yCoord
       }
     }).then(function successCallback(response) {
       console.log(response.data);
@@ -43,27 +75,5 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     });
   };
 
-  $scope.loadPlayerGameState = function() {
-    $http({
-      method: 'GET',
-      url: '/games/'+ $routeParams.gameId + '.json'
-    }).then(function successCallback(response) {
-      $scope.game = response.data;
-
-      Auth.currentUser().then(function(user) {
-        $scope.currentUser = user;
-        $scope.playerGameState = findCurrentPlayerGameState($scope.game.player_game_states, $scope.currentUser)
-        if ($scope.playerGameState === null) {
-          $scope.displayError = 'Unable to identify current players data';
-        }
-      }, function(error) {
-        $scope.displayError = 'Unable to load user profile';
-      });
-    }, function errorCallback(response) {
-      $scope.displayError = 'Unable to load game state';
-    });
-  };
-
-  $scope.loadPlayerGameState();
-
+  loadPlayerGameState();
 }]);
