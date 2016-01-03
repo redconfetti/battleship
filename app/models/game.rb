@@ -35,6 +35,13 @@ class Game < ActiveRecord::Base
     state
   end
 
+  ###########################
+  # Channel Communication
+
+  def trigger_update
+    Pusher.trigger("game-#{id}", 'updated', to_json)
+  end
+
   #####################
   # State Checks
 
@@ -62,9 +69,7 @@ class Game < ActiveRecord::Base
 
   def end_current_turn
     update(current_player_id: current_target.id)
-    player_game_states.each do |game_state|
-      game_state.publish_update
-    end
+    trigger_update
   end
 
 end

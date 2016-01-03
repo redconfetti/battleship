@@ -92,6 +92,16 @@ RSpec.describe Game, type: :model do
   end
 
   #####################
+  # Channel Communications
+
+  describe '#trigger_update' do
+    it 'sends update event notice to pusher' do
+      expect(Pusher).to receive(:trigger).with("game-#{subject.id}", 'updated', subject.to_json)
+      subject.trigger_update
+    end
+  end
+
+  #####################
   # State Checks
 
   describe '#is_player?' do
@@ -119,17 +129,6 @@ RSpec.describe Game, type: :model do
       expect(game.is_turn? player1).to eq false
     end
   end
-
-  # describe '#is_complete?' do
-  #   context 'when all of a players ship spaces are hit' do
-  #     it 'returns true'
-  #     it 'updates game status as completed'
-  #   end
-  #
-  #   context 'when either player still has ship spaces' do
-  #     it 'returns false'
-  #   end
-  # end
 
   #####################
   # Actions
@@ -175,6 +174,13 @@ RSpec.describe Game, type: :model do
       game.end_current_turn
       expect(game.reload.current_player).to eq player2
     end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update)
+      game.add_player(player1)
+      game.add_player(player2)
+      game.end_current_turn
+    end
   end
 
   describe '#complete' do
@@ -183,28 +189,5 @@ RSpec.describe Game, type: :model do
       expect(subject.reload.status).to eq 'complete'
     end
   end
-
-  # describe '#take_shot' do
-  #   it 'raises exception if not opposing players turn'
-  #   context 'when registering shot in current players game state' do
-  #     context 'when shot was a miss' do
-  #       it 'registers a miss on tracking grid'
-  #     end
-  #
-  #     context 'when shot was a hit' do
-  #       it 'registers a hit on tracking grid'
-  #     end
-  #   end
-  #   context 'when registering shot in enemy players game state' do
-  #     context 'when shot was a miss' do
-  #       it 'registers a miss on enemy players battle grid'
-  #     end
-  #
-  #     context 'when shot was a hit' do
-  #       it 'registers a hit on enemy players battle grid'
-  #     end
-  #   end
-  #
-  # end
 
 end
