@@ -2,41 +2,46 @@ require 'rails_helper'
 require 'set'
 
 RSpec.describe PlayerGameState, type: :model do
+  let(:player_game_state)   { create(:player_game_state) }
+  let(:game)                { player_game_state.game }
+  let(:player)              { player_game_state.player }
   let(:player2)             { create(:player2) }
   let(:player3)             { create(:player3) }
-  let(:game_with_player)    { create(:game_with_player) }
-  let(:game_with_players)   { create(:game_with_players) }
-  subject { create(:game_with_player).player_game_states[0] }
+  subject                   { player_game_state }
 
   describe ".for_game" do
     it 'returns PlayerGameStates for game' do
-      result = PlayerGameState.for_game(game_with_players)
+      game.add_player(player2)
+      result = PlayerGameState.for_game(game)
       expect(result).to be_an_instance_of PlayerGameState::ActiveRecord_Relation
       expect(result.count).to eq 2
     end
   end
 
-  it 'belongs to game' do
-    result = subject.game
-    expect(result).to be_an_instance_of Game
-    expect(result.created_at).to eq '2015-01-26 04:15:32'
-  end
+  describe 'associations' do
+    it 'belongs to game' do
+      result = subject.game
+      expect(result).to be_an_instance_of Game
+      expect(result.created_at).to eq '2015-01-26 04:15:32'
+    end
 
-  it 'belongs to player' do
-    result = subject.player
-    expect(result).to be_an_instance_of Player
-    expect(result.email).to eq 'johndoe@example.com'
+    it 'belongs to player' do
+      result = subject.player
+      expect(result).to be_an_instance_of Player
+      expect(result.email).to eq 'johndoe@example.com'
+    end
   end
 
   describe 'validations' do
     it 'allows second player in game' do
-      player2_game_state = PlayerGameState.new(game: game_with_player, player: player2)
+      player2_game_state = PlayerGameState.new(game: game, player: player2)
       expect(player2_game_state.valid?).to eq true
       expect(player2_game_state.errors).to_not have_key(:game)
     end
 
     it 'prevents more than two players in game' do
-      player3_game_state = PlayerGameState.new(game: game_with_players, player: player3)
+      game.add_player(player2)
+      player3_game_state = PlayerGameState.new(game: game, player: player3)
       expect(player3_game_state.valid?).to eq false
       expect(player3_game_state.errors).to have_key(:game)
     end
@@ -65,7 +70,28 @@ RSpec.describe PlayerGameState, type: :model do
     end
   end
 
-  describe 'battlegrid generation' do
+  describe 'channel communication' do
+
+    describe '#channel_name' do
+      it 'returns channel name' do
+        expect(subject.channel_name).to eq "game#{game.id}-player#{player.id}"
+      end
+    end
+
+    describe '#publish_update' do
+      it 'publishes json to channel' do
+        mock_json = {:test => '123'}.to_json
+        allow(subject).to receive(:to_json).and_return(mock_json)
+        game_id = game.id
+        player_id = player.id
+        expect(REDIS).to receive(:publish).with("game#{game.id}-player#{player.id}", mock_json)
+        subject.publish_update
+      end
+    end
+
+  end
+
+  describe 'grid generation' do
     before { subject.init_grids }
 
     describe '#available_placements' do

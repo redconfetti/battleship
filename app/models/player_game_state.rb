@@ -28,6 +28,20 @@ class PlayerGameState < ActiveRecord::Base
     end
   end
 
+  ###########################
+  # Channel Communication
+
+  def channel_name
+    "game#{game.id}-player#{player.id}"
+  end
+
+  def publish_update
+    REDIS.publish(channel_name, to_json)
+  end
+
+  ###########################
+  # Grid Generation
+
   def init_grids
     grid = []
     (0..9).to_a.each do |x|
