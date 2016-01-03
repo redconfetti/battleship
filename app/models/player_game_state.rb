@@ -28,6 +28,11 @@ class PlayerGameState < ActiveRecord::Base
     end
   end
 
+  def as_json(options = {})
+    options[:include] = [:game, :player]
+    super(options)
+  end
+
   ###########################
   # Channel Communication
 

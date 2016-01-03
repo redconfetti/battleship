@@ -18,6 +18,24 @@ RSpec.describe PlayerGameState, type: :model do
     end
   end
 
+  describe '#as_json' do
+    it 'returns json representation' do
+      expect(subject.as_json).to be_an_instance_of Hash
+    end
+
+    it 'includes game' do
+      result = subject.as_json
+      expect(result['game']).to be_an_instance_of Hash
+      expect(result['game']['id']).to eq subject.game_id
+    end
+
+    it 'includes player' do
+      result = subject.as_json
+      expect(result['player']).to be_an_instance_of Hash
+      expect(result['player']['id']).to eq subject.player_id
+    end
+  end
+
   describe 'associations' do
     it 'belongs to game' do
       result = subject.game

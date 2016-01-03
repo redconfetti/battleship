@@ -33,8 +33,7 @@ RSpec.describe Game, type: :model do
 
   describe '#as_json' do
     it 'returns json representation' do
-      result = subject.as_json
-      expect(result).to be_an_instance_of Hash
+      expect(subject.as_json).to be_an_instance_of Hash
     end
 
     it 'includes start date in json' do
