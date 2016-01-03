@@ -53,10 +53,6 @@ gem 'sprockets', '2.12.3'
 # Manage Procfile-based applications
 gem "foreman"
 
-# Ruby client library for Redis
-# https://github.com/redis/redis-rb
-gem 'redis', '~>3.2'
-
 # Ruby Web Server Built For Concurrency
 # https://github.com/puma/puma
 gem 'puma'
