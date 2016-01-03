@@ -20,14 +20,10 @@ class GamesController < ApplicationController
 
   # GET /games/:id.json
   def show
-    game = Game.includes(player_game_states: [:player]).find(params[:id])
-    game_associations = {
-      :player_game_states => {
-        :include=> :player
-      }
-    }
+    game = Game.find(params[:id])
+    player_game_state = game.player_state(current_player)
     respond_to do |format|
-      format.json { render json: game.to_json(:include => game_associations) }
+      format.json { render json: player_game_state.to_json }
     end
   end
 
