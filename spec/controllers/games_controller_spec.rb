@@ -1,8 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
-  let(:game_with_players)   { create(:game_with_players) }
-  let(:player3)             { create(:player3) }
+  let(:game) { create(:game) }
+  let(:player1) { create(:player1) }
+  let(:player2) { create(:player2) }
+  let(:player3) { create(:player3) }
+  let(:game_with_players) { game.add_player(player1); game.add_player(player2); game }
 
   before :each do
     request.env['HTTP_ACCEPT'] = 'application/json'
@@ -125,7 +128,22 @@ RSpec.describe GamesController, type: :controller do
       put :join, id: game_with_players.id
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
-      puts "json_response: #{json_response.inspect}"
+    end
+  end
+
+  describe 'PUT #fire' do
+    it 'returns error if not players turn' do
+      game.end_current_turn
+      put :fire, id: game_with_players.id, x: 2, y: 3
+      expect(response).to have_http_status(:forbidden)
+      json_response = JSON.parse(response.body)
+      expect(json_response['error']).to eq "It is not your turn"
+    end
+
+    it 'ends current turn' do
+      put :fire, id: game_with_players.id, x: 6, y: 8
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
     end
   end
 

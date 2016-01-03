@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     get 'incomplete', on: :collection
     put 'end', on: :member
     put 'join', on: :member
+    put 'fire', on: :member
   end
 
   # Example of regular route:

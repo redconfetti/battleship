@@ -1,4 +1,5 @@
 class GamesController < ApplicationController
+
   before_action :authenticate_player!
 
   # GET /games.json
@@ -57,4 +58,15 @@ class GamesController < ApplicationController
       format.json { render json: game.to_json }
     end
   end
+
+  # PUT /player_game_states/:id/fire.json
+  def fire
+    game = Game.find(params[:id])
+    raise Exceptions::Forbidden, "It is not your turn" unless game.is_turn?(current_player)
+    game.end_current_turn
+    respond_to do |format|
+      format.json { render json: game.to_json(:include => :player_game_states) }
+    end
+  end
+
 end
