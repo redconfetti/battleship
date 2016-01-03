@@ -34,6 +34,11 @@ RSpec.describe PlayerGameState, type: :model do
       expect(result['player']).to be_an_instance_of Hash
       expect(result['player']['id']).to eq subject.player_id
     end
+
+    it 'includes pusher key' do
+      result = subject.as_json
+      expect(result['pusherKey']).to eq Pusher.key
+    end
   end
 
   describe 'associations' do

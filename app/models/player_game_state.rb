@@ -30,7 +30,9 @@ class PlayerGameState < ActiveRecord::Base
 
   def as_json(options = {})
     options[:include] = [:game, :player]
-    super(options)
+    super(options).merge({
+      'pusherKey' => Pusher.key
+    })      
   end
 
   ###########################

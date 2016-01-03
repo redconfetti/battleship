@@ -72,6 +72,13 @@ RSpec.describe GamesController, type: :controller do
       player = player_game_state['player']
       expect(player['id']).to eq current_player.id
     end
+
+    it 'includes pusher key' do
+      get :show, id: game_with_players.id
+      player_game_state = JSON.parse(response.body)
+      expect(player_game_state).to be_an_instance_of Hash
+      expect(player_game_state['pusherKey']).to eq Pusher.key
+    end
   end
 
   describe 'POST #create' do
