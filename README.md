@@ -28,8 +28,7 @@ See [Battleship game](https://en.wikipedia.org/wiki/Battleship_%28game%29) for f
 4. Use `bundle install` to install RubyGem dependencies
 5. Use `brew install node` to install NodeJS / Node Package Manager (NPM)
 6. Use `npm install -g bower` to globally install Bower
-7. Use `brew install redis` to install Redis
-8. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
+7. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
 
 ## Bower
 
@@ -55,25 +54,21 @@ $ heroku create
 # Deploy Changes
 $ git push heroku master
 
-# Activate Redis Add-on for Heroku (Hobby-Dev - No Charge)
-$ heroku addons:create heroku-redis:hobby-dev
-
-# Install the Redis CLI Plugin
-$ heroku plugins:install heroku-redis
-
-# Check if Redis Add-on is provisioned
-$ heroku addons | grep REDIS
-
-# View Redis server config
-$ heroku config | grep REDIS
+# Activate Pusher Add-on for Heroku (Sandbox - No Charge)
+$ heroku addons:create pusher:sandbox
 ```
 
-## Log
+### Pusher Development
 
-* Analyzed specifications and developed design (models and relationships)
-* Resolved local conflicts with Homebrew
-  * Updated Homebrew
-  * Resolved `brew doctor` issues
-  * Updated [XQuartz](http://www.xquartz.org/)
-* Used [Bootstrapping AngularJS with Rails](http://angular-rails.com/bootstrap.html)
+This application relies on the Pusher service to notify each Players client that an update has occurred to the state of the game.
 
+You should [obtain the keys for local development](https://devcenter.heroku.com/articles/pusher#configure-for-local-use) from Heroku, and configure them in your local environment. This can be done in your ~/.profile or ~/.bash_profile
+
+```
+# Pusher (Required for Battleship Rails App)
+export PUSHER_APP_ID=123456
+export PUSHER_KEY=a2b3c4d5e6f7g8h9i0
+export PUSHER_SECRET=a2b3c4d5e6f7g8h9i0
+```
+
+Pusher will automatically be [configured by Heroku](https://devcenter.heroku.com/articles/pusher#production-credentials) in production.
