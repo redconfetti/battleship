@@ -64,6 +64,7 @@ class Game < ActiveRecord::Base
     player_game_states.create(player: player)
     update(status: 'playing') if players.count == 2
     update(current_player_id: player.id) if current_player == nil
+    trigger_update
   end
 
   def take_shot(player, enemy_x, enemy_y)

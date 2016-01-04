@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
+  before { allow(Pusher).to receive(:trigger).and_return(nil) }
+
   let(:game)              { create(:game) }
   let(:game_with_players) { create(:game_with_players) }
   let(:player1)           { game_with_players.players[0] }
@@ -162,6 +164,11 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       expect(game.current_player).to eq player1
     end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update).at_least(:once)
+      game.add_player(player1)
+    end
   end
 
   describe '#take_shot' do
@@ -218,7 +225,7 @@ RSpec.describe Game, type: :model do
     end
 
     it 'notifies players of update to game state' do
-      expect(game).to receive(:trigger_update)
+      expect(game).to receive(:trigger_update).at_least(:once)
       game.add_player(player1)
       game.add_player(player2)
       expect(game.current_player).to eq player1

@@ -2,6 +2,8 @@ require 'rails_helper'
 require 'set'
 
 RSpec.describe PlayerGameState, type: :model do
+  before { allow(Pusher).to receive(:trigger).and_return(nil) }
+
   let(:player_game_state)   { create(:player_game_state) }
   let(:game)                { player_game_state.game }
   let(:player1)             { player_game_state.player }
