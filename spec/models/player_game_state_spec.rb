@@ -62,6 +62,14 @@ RSpec.describe PlayerGameState, type: :model do
       expect(player2_game_state.errors).to_not have_key(:game)
     end
 
+    it 'allows saving existing player in game' do
+      player2_game_state = PlayerGameState.create(game: game, player: player2)
+      player2_game_state.receive_shot(7, 9)
+      player2_game_state.save
+      expect(player2_game_state.errors.count).to eq 0
+      expect(player2_game_state.battle_grid[7][9]).to_not eq PlayerGameState::WATER
+    end
+
     it 'prevents more than two players in game' do
       game.add_player(player2)
       player3_game_state = PlayerGameState.new(game: game, player: player3)
@@ -71,34 +79,145 @@ RSpec.describe PlayerGameState, type: :model do
   end
 
   describe 'before_creation' do
-    it 'initializes the battle and tracking grids' do
-      tracking_grid = subject.tracking_grid
-      battle_grid = subject.battle_grid
+    describe 'initialize_state' do
+      it 'initializes the battle and tracking grids' do
+        tracking_grid = subject.tracking_grid
+        battle_grid = subject.battle_grid
 
-      [tracking_grid, battle_grid].each do |grid|
-        expect(grid).to be_an_instance_of Array
-        expect(grid.count).to eq 10
-        grid.each do |x|
-          expect(x.count).to eq 10
+        [tracking_grid, battle_grid].each do |grid|
+          expect(grid).to be_an_instance_of Array
+          expect(grid.count).to eq 10
+          grid.each do |x|
+            expect(x.count).to eq 10
+          end
         end
       end
     end
 
-    it 'automatically places ships on battlegrid' do
-      battle_spaces = subject.battle_grid.flatten
-      water_spaces = battle_spaces.reject { |space| space != 'w' }
-      expect(water_spaces.count).to eq 82
-      ship_spaces = battle_spaces.reject { |space| space != 's' }
-      expect(ship_spaces.count).to eq 18      
+    describe 'build_battle_grid' do
+      it 'automatically places ships on battlegrid' do
+        battle_spaces = subject.battle_grid.flatten
+        water_spaces = battle_spaces.reject { |space| space != PlayerGameState::WATER }
+        expect(water_spaces.count).to eq 82
+        ship_spaces = battle_spaces.reject { |space| space != PlayerGameState::SHIP }
+        expect(ship_spaces.count).to eq 18      
+      end
+    end
+  end
+
+  describe '#enemy_player_state' do
+    it 'returns nil when no other player' do
+      expect(subject.enemy_player_state).to eq nil
+    end
+
+    it 'returns opponents player game state' do
+      game.add_player(player2)
+      result = subject.enemy_player_state
+      expect(result).to be_an_instance_of PlayerGameState
+      expect(result.player_id).to eq player2.id
+    end
+  end
+
+  describe 'battle actions' do
+    before { subject.initialize_state }
+
+    describe '#receive_shot' do
+      before { game.add_player(player2) }
+      context 'when battle grid space is water' do
+        it 'marks battle grid with miss when space is water' do
+          subject.receive_shot(3, 4)
+          expect(subject.battle_grid[3][4]).to eq PlayerGameState::MISS
+        end
+
+        it 'updates enemy tracking with miss when space is water' do
+          subject.receive_shot(3, 4)
+          expect(subject.enemy_player_state.tracking_grid[3][4]).to eq PlayerGameState::MISS
+        end
+      end
+
+      context 'when battle grid space is ship' do
+        before { subject.place_ship(2, 4, 5, PlayerGameState::EAST) }
+        it 'marks battle grid with hit' do
+          subject.receive_shot(3, 4)
+          expect(subject.battle_grid[3][4]).to eq PlayerGameState::HIT
+        end
+
+        it 'updates enemy tracking with hit' do
+          subject.receive_shot(3, 4)
+          expect(subject.enemy_player_state.tracking_grid[3][4]).to eq PlayerGameState::HIT
+        end
+      end
+    end
+
+    describe '#update_enemy_tracking' do
+      it 'applies value to enemy tracking grid' do
+        game.add_player(player2)
+        subject.update_enemy_tracking(4, 8, PlayerGameState::MISS)
+        enemy_game_state = game.player_state(player2)
+        expect(enemy_game_state).to be_an_instance_of PlayerGameState
+        expect(enemy_game_state.tracking_grid[4][8]).to eq PlayerGameState::MISS
+      end
+    end
+
+    describe '#hits' do
+      it 'returns the coordinates for hit spaces' do
+        game.add_player(player2)
+        subject.place_ship(2, 4, 5, PlayerGameState::EAST)
+        subject.receive_shot(7, 9) # miss
+        subject.receive_shot(3, 4) # hit
+        subject.receive_shot(4, 4) # hit
+        subject.receive_shot(4, 8) # miss
+        subject.receive_shot(3, 8) # miss
+        expect(subject.hits).to eq [[3,4],[4,4]]
+      end
+    end
+
+    describe '#misses' do
+      it 'returns the number of opponent misses' do
+        game.add_player(player2)
+        subject.place_ship(2, 4, 5, PlayerGameState::EAST)
+        subject.receive_shot(7, 9) # miss
+        subject.receive_shot(3, 4) # hit
+        subject.receive_shot(4, 8) # miss
+        subject.receive_shot(3, 8) # miss
+        expect(subject.misses).to eq [[3,8],[4,8],[7,9]]
+      end
+    end
+
+    describe '#remaining' do
+      it 'returns the number of remaining ship placements' do
+        game.add_player(player2)
+        subject.place_ship(2, 4, 2, PlayerGameState::EAST)
+        subject.receive_shot(3, 4) # hit
+        expect(subject.remaining).to eq [[2,4]]
+      end
+    end
+
+    describe '#defeated?' do
+      it 'returns false when ship placements still remaining' do
+        game.add_player(player2)
+        subject.place_ship(2, 4, 2, PlayerGameState::SOUTH)
+        subject.receive_shot(2, 4) # hit
+        subject.receive_shot(2, 6) # miss
+        expect(subject.defeated?).to eq true
+      end
+
+      it 'returns true when ship placements all hit' do
+        game.add_player(player2)
+        subject.place_ship(2, 4, 2, PlayerGameState::SOUTH)
+        subject.receive_shot(2, 4) # hit
+        subject.receive_shot(2, 5) # hit
+        expect(subject.defeated?).to eq false
+      end
     end
   end
 
   describe 'grid generation' do
-    before { subject.init_grids }
+    before { subject.initialize_state }
 
     describe '#available_placements' do
       context 'when spaces taken' do
-        before { subject.place_ship(5, 4, 5, 'S') }
+        before { subject.place_ship(5, 4, 5, PlayerGameState::SOUTH) }
         it 'returns available spaces' do
           result = subject.available_placements(2)
           placement_set = Set.new result
@@ -133,14 +252,14 @@ RSpec.describe PlayerGameState, type: :model do
             expect(placement.count).to eq 3
             expect(placement[0]).to be_an_instance_of Fixnum
             expect(placement[1]).to be_an_instance_of Fixnum
-            expect(['S', 'E'].index(placement[2])).to_not be_nil
+            expect([PlayerGameState::SOUTH, PlayerGameState::EAST].index(placement[2])).to_not be_nil
           end
         end
       end
 
       context 'when all spaces taken' do
         before do
-          subject.grid_map!('battle') { |grid, x, y| grid[x][y] = 's' }
+          subject.grid_map!('battle') { |grid, x, y| grid[x][y] = PlayerGameState::SHIP }
         end
         it 'returns no spaces' do
           result = subject.available_placements(2)
@@ -152,41 +271,41 @@ RSpec.describe PlayerGameState, type: :model do
 
     describe '#place_ship' do
       it 'raises exception if placement is not valid' do
-        expect { subject.place_ship(8, 2, 3, 'E') }.to raise_error(ArgumentError, "Invalid placement for 3 space ship at [8,2] positioned E")
+        expect { subject.place_ship(8, 2, 3, PlayerGameState::EAST) }.to raise_error(ArgumentError, "Invalid placement for 3 space ship at [8,2] positioned E")
       end
 
       it 'places ship in correct coordinates horizontally' do
-        subject.place_ship(3, 5, 3, 'E')
-        expect(subject.battle_grid[3][5]).to eq 's' # first space should be ship
-        expect(subject.battle_grid[4][5]).to eq 's' # second space should be ship
-        expect(subject.battle_grid[5][5]).to eq 's' # third space should be ship
-        expect(subject.battle_grid[2][5]).to eq 'w' # west of first space should be water
-        expect(subject.battle_grid[3][4]).to eq 'w' # north of first space should be water
-        expect(subject.battle_grid[3][6]).to eq 'w' # south of first space should be water
-        expect(subject.battle_grid[6][5]).to eq 'w' # east of last space should be water
+        subject.place_ship(3, 5, 3, PlayerGameState::EAST)
+        expect(subject.battle_grid[3][5]).to eq PlayerGameState::SHIP # first space should be ship
+        expect(subject.battle_grid[4][5]).to eq PlayerGameState::SHIP # second space should be ship
+        expect(subject.battle_grid[5][5]).to eq PlayerGameState::SHIP # third space should be ship
+        expect(subject.battle_grid[2][5]).to eq PlayerGameState::WATER # west of first space should be water
+        expect(subject.battle_grid[3][4]).to eq PlayerGameState::WATER # north of first space should be water
+        expect(subject.battle_grid[3][6]).to eq PlayerGameState::WATER # south of first space should be water
+        expect(subject.battle_grid[6][5]).to eq PlayerGameState::WATER # east of last space should be water
       end
 
       it 'places ship in correct coordinates vertically' do
-        subject.place_ship(3, 5, 3, 'S')
-        expect(subject.battle_grid[3][5]).to eq 's' # first space should be ship
-        expect(subject.battle_grid[3][6]).to eq 's' # second space should be ship
-        expect(subject.battle_grid[3][7]).to eq 's' # third space should be ship
-        expect(subject.battle_grid[2][5]).to eq 'w' # west of first space should be water
-        expect(subject.battle_grid[3][4]).to eq 'w' # north of first space should be water
-        expect(subject.battle_grid[4][5]).to eq 'w' # east of first space should be water
-        expect(subject.battle_grid[3][8]).to eq 'w' # south of last space should be water
+        subject.place_ship(3, 5, 3, PlayerGameState::SOUTH)
+        expect(subject.battle_grid[3][5]).to eq PlayerGameState::SHIP # first space should be ship
+        expect(subject.battle_grid[3][6]).to eq PlayerGameState::SHIP # second space should be ship
+        expect(subject.battle_grid[3][7]).to eq PlayerGameState::SHIP # third space should be ship
+        expect(subject.battle_grid[2][5]).to eq PlayerGameState::WATER # west of first space should be water
+        expect(subject.battle_grid[3][4]).to eq PlayerGameState::WATER # north of first space should be water
+        expect(subject.battle_grid[4][5]).to eq PlayerGameState::WATER # east of first space should be water
+        expect(subject.battle_grid[3][8]).to eq PlayerGameState::WATER # south of last space should be water
       end
     end
 
     describe '#valid_placement?' do
       it 'returns true when placement falls in of grid' do
-        expect(subject.valid_placement?(7, 2, 3, 'E')).to eq true
-        expect(subject.valid_placement?(2, 7, 3, 'S')).to eq true
+        expect(subject.valid_placement?(7, 2, 3, PlayerGameState::EAST)).to eq true
+        expect(subject.valid_placement?(2, 7, 3, PlayerGameState::SOUTH)).to eq true
       end
 
       it 'returns false when placement falls outside of grid' do
-        expect(subject.valid_placement?(8, 2, 3, 'E')).to eq false
-        expect(subject.valid_placement?(2, 8, 3, 'S')).to eq false
+        expect(subject.valid_placement?(8, 2, 3, PlayerGameState::EAST)).to eq false
+        expect(subject.valid_placement?(2, 8, 3, PlayerGameState::SOUTH)).to eq false
       end
     end
 
@@ -197,25 +316,25 @@ RSpec.describe PlayerGameState, type: :model do
       end
 
       it 'returns coordinates' do
-        result = subject.get_coordinates(0, 0, 3, 'S')
+        result = subject.get_coordinates(0, 0, 3, PlayerGameState::SOUTH)
         expect(result).to be_an_instance_of Array
         expect(result.count).to eq 3
         expect(result).to eq [[0, 0], [0, 1], [0, 2]]
 
-        result = subject.get_coordinates(5, 7, 2, 'E')
+        result = subject.get_coordinates(5, 7, 2, PlayerGameState::EAST)
         expect(result).to be_an_instance_of Array
         expect(result.count).to eq 2
         expect(result).to eq [[5, 7], [6, 7]]
       end
 
       it 'returns false if coordinate falls outside of grid' do
-        expect(subject.get_coordinates(4, 9, 2, 'S')).to eq false
-        expect(subject.get_coordinates(9, 0, 2, 'E')).to eq false
-        expect(subject.get_coordinates(9, 9, 2, 'S')).to eq false
-        expect(subject.get_coordinates(9, 9, 2, 'E')).to eq false
-        expect(subject.get_coordinates(9, 8, 3, 'E')).to eq false
-        expect(subject.get_coordinates(6, 7, 4, 'S')).to eq false
-        expect(subject.get_coordinates(7, 8, 4, 'E')).to eq false
+        expect(subject.get_coordinates(4, 9, 2, PlayerGameState::SOUTH)).to eq false
+        expect(subject.get_coordinates(9, 0, 2, PlayerGameState::EAST)).to eq false
+        expect(subject.get_coordinates(9, 9, 2, PlayerGameState::SOUTH)).to eq false
+        expect(subject.get_coordinates(9, 9, 2, PlayerGameState::EAST)).to eq false
+        expect(subject.get_coordinates(9, 8, 3, PlayerGameState::EAST)).to eq false
+        expect(subject.get_coordinates(6, 7, 4, PlayerGameState::SOUTH)).to eq false
+        expect(subject.get_coordinates(7, 8, 4, PlayerGameState::EAST)).to eq false
       end
     end
 
@@ -226,11 +345,11 @@ RSpec.describe PlayerGameState, type: :model do
       end
 
       it 'returns position south' do
-        expect(subject.neighbor_position(4, 4, 'S')).to eq [4,5]
+        expect(subject.neighbor_position(4, 4, PlayerGameState::SOUTH)).to eq [4,5]
       end
 
       it 'returns position east' do
-        expect(subject.neighbor_position(4, 4, 'E')).to eq [5,4]
+        expect(subject.neighbor_position(4, 4, PlayerGameState::EAST)).to eq [5,4]
       end
     end
 
@@ -253,8 +372,8 @@ RSpec.describe PlayerGameState, type: :model do
 
     describe '#grid_collect' do
       it 'returns all elements where code block is not false' do
-        subject.place_ship(2, 3, 2, 'E')
-        result = subject.grid_collect('battle') { |grid, x, y| [x,y] if grid[x][y] != 'w' } # get all non-water
+        subject.place_ship(2, 3, 2, PlayerGameState::EAST)
+        result = subject.grid_collect('battle') { |grid, x, y| [x,y] if grid[x][y] != PlayerGameState::WATER } # get all non-water
         expect(result).to be_an_instance_of Array
         expect(result.count).to eq 2
         expect(result[0]).to eq [2,3]
@@ -264,9 +383,9 @@ RSpec.describe PlayerGameState, type: :model do
 
     describe '#grid_map!' do
       it 'allows custom operation on each grid space' do
-        subject.grid_map!('battle') { |grid, x, y| grid[x][y] = 's' } # set all spaces to 's'
+        subject.grid_map!('battle') { |grid, x, y| grid[x][y] = PlayerGameState::SHIP } # set all spaces to 's'
         battle_spaces = subject.battle_grid.flatten
-        water_spaces = battle_spaces.reject { |space| space != 'w' }
+        water_spaces = battle_spaces.reject { |space| space != PlayerGameState::WATER }
         expect(water_spaces.count).to eq 0
       end
     end
