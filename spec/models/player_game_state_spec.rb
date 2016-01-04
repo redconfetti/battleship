@@ -35,6 +35,13 @@ RSpec.describe PlayerGameState, type: :model do
       expect(result['player']['id']).to eq subject.player_id
     end
 
+    it 'includes enemy' do
+      game.add_player(player2)
+      result = subject.as_json
+      expect(result['enemy']).to be_an_instance_of Hash
+      expect(result['enemy']['id']).to eq player2.id
+    end
+
     it 'includes pusher key' do
       result = subject.as_json
       expect(result['pusherKey']).to eq Pusher.key
@@ -134,6 +141,19 @@ RSpec.describe PlayerGameState, type: :model do
       result = subject.enemy_player_state
       expect(result).to be_an_instance_of PlayerGameState
       expect(result.player_id).to eq player2.id
+    end
+  end
+
+  describe '#enemy_player' do
+    it 'returns nil when no other player' do
+      expect(subject.enemy_player).to eq nil
+    end
+
+    it 'returns opponent' do
+      game.add_player(player2)
+      result = subject.enemy_player
+      expect(result).to be_an_instance_of Player
+      expect(result.id).to eq player2.id
     end
   end
 

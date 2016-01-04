@@ -36,6 +36,7 @@ class PlayerGameState < ActiveRecord::Base
   def as_json(options = {})
     options[:include] = [:game, :player]
     super(options).merge({
+      'enemy' => enemy_player.as_json,
       'stats' => {
         'hits' => self.hits.count,
         'misses' => self.misses.count,
@@ -46,6 +47,10 @@ class PlayerGameState < ActiveRecord::Base
       },
       'pusherKey' => Pusher.key
     })      
+  end
+
+  def enemy_player
+    game.players.where.not(id: player_id).first
   end
 
   def enemy_player_state
