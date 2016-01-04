@@ -5,7 +5,7 @@
 <div class="container-fluid" data-ng-hide="displayError">
   <div class="row">
 
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Your Ships</h3>
@@ -20,11 +20,29 @@
             </tr>
           </table>
 
+          <div class="col-md-12 col-sm-6 col-xs-12">
+            <h4>Statistics</h4>
+            <table class="table table-bordered">
+              <tr>
+                <th scope="row">Hits</th>
+                <td><span data-ng-bind="playerGameState.battleGridStats.hits"></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Misses</th>
+                <td><span data-ng-bind="playerGameState.battleGridStats.hits"></span></td>
+              </tr>
+              <tr>
+                <th scope="row">Ship Spaces Remaining</th>
+                <td><span data-ng-bind="playerGameState.battleGridStats.remaining"></span></td>
+              </tr>
+            </table>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">
@@ -45,12 +63,6 @@
 
         </div>
       </div>
-    </div>
-
-    <div class="col-md-4">
-      <h4>
-        Status
-      </h4>      
     </div>
 
   </div>

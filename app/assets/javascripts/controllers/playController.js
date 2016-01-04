@@ -8,7 +8,6 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
       url: '/games/'+ $routeParams.gameId + '.json'
     }).then(function successCallback(response) {
       $scope.playerGameState = response.data;
-      console.log($scope.playerGameState);
       if (!pushListenerRegistered) {
         registerPusherListener();
         pushListenerRegistered = true;
@@ -19,15 +18,6 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   var registerPusherListener = function() {
-    // Enable pusher logging - don't include this in production
-    /*
-    Pusher.log = function(message) {
-      if (window.console && window.console.log) {
-        window.console.log(message);
-      }
-    };
-    */
-
     var pusher = new Pusher($scope.playerGameState.pusherKey, {
       encrypted: true
     });
@@ -52,15 +42,17 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
       case 's':
         styles['grid-space-ship'] = true
         break;
-      case 's':
+      case 'h':
         styles['grid-space-hit'] = true
+        break;
+      case 'm':
+        styles['grid-space-miss'] = true
         break;
     }
     return styles;
   }
 
   $scope.fireShot = function(xCoord, yCoord) {
-    console.log('shot fired at X: ' + xCoord + ', Y: ' + yCoord);
     $http({
       method: 'PUT',
       url: '/games/'+ $routeParams.gameId + '/fire.json',
@@ -69,7 +61,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
         y: yCoord
       }
     }).then(function successCallback(response) {
-      console.log(response.data);
+      // console.log(response.data);
     }, function errorCallback(response) {
       $scope.displayError = 'Error firing shot';
     });

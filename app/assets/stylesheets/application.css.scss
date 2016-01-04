@@ -41,7 +41,10 @@ body {
     background-color: #330;
   }
   .grid-space-hit {
-    background-color: #c30;
+    background-color: #f00;
+  }
+  .grid-space-miss {
+    background-color: #69f;
   }
   .grid-spacer {
     height: 30px;
