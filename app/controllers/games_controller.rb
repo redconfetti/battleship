@@ -59,9 +59,10 @@ class GamesController < ApplicationController
   def fire
     game = Game.find(params[:id])
     raise Exceptions::Forbidden, "It is not your turn" unless game.is_turn?(current_player)
+    game.take_shot(current_player, params[:x].to_i, params[:y].to_i)
     game.end_current_turn
     respond_to do |format|
-      format.json { render json: game.to_json(:include => :player_game_states) }
+      format.json { render json: game.to_json }
     end
   end
 
