@@ -39,6 +39,22 @@ RSpec.describe PlayerGameState, type: :model do
       result = subject.as_json
       expect(result['pusherKey']).to eq Pusher.key
     end
+
+    it 'includes battle grid stats' do
+      subject.initialize_state
+      game.add_player(player2)
+      subject.place_ship(2, 4, 3, PlayerGameState::EAST)
+      subject.receive_shot(7, 9) # miss
+      subject.receive_shot(3, 4) # hit
+      subject.receive_shot(4, 4) # hit
+      subject.receive_shot(4, 8) # miss
+      subject.receive_shot(3, 8) # miss
+      result = subject.as_json
+      expect(result['battleGridStats']).to be_an_instance_of Hash
+      expect(result['battleGridStats']['hits']).to eq 2
+      expect(result['battleGridStats']['misses']).to eq 3
+      expect(result['battleGridStats']['remaining']).to eq 1
+    end
   end
 
   describe 'associations' do

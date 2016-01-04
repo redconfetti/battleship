@@ -36,6 +36,12 @@ class PlayerGameState < ActiveRecord::Base
   def as_json(options = {})
     options[:include] = [:game, :player]
     super(options).merge({
+      'battleGridStats' => {
+        'hits' => hits.count,
+        'misses' => misses.count,
+        'remaining' => remaining.count,
+      },
+      'battleGridMisses' => hits.count,
       'pusherKey' => Pusher.key
     })      
   end
