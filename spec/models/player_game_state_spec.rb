@@ -55,6 +55,7 @@ RSpec.describe PlayerGameState, type: :model do
       expect(result['stats']['misses']).to eq 3
       expect(result['stats']['remaining']).to eq 1
       expect(result['stats']['enemyHits']).to eq 0
+      expect(result['stats']['enemyMisses']).to eq 0
       expect(result['stats']['enemyRemaining']).to eq 18
     end
   end
@@ -232,6 +233,25 @@ RSpec.describe PlayerGameState, type: :model do
         player2_game_state.receive_shot(5, 4) # hit
         player2_game_state.receive_shot(3, 5) # miss
         expect(player1_game_state.enemy_hit_count).to eq 2
+      end
+    end
+
+    describe '#enemy_misses_count' do
+      it 'returns 0 if no enemy present' do
+        expect(subject.enemy_misses_count).to eq 0
+      end
+
+      it 'returns the number of enemy spaces hit' do
+        game.add_player(player2)
+        player1_game_state = game.player_state(player1)
+        player2_game_state = game.player_state(player2)
+        player1_game_state.initialize_state
+        player2_game_state.initialize_state
+        player2_game_state.place_ship(2, 4, 5, PlayerGameState::EAST)
+        player2_game_state.receive_shot(3, 4) # hit
+        player2_game_state.receive_shot(5, 4) # hit
+        player2_game_state.receive_shot(3, 5) # miss
+        expect(player1_game_state.enemy_misses_count).to eq 1
       end
     end
 

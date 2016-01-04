@@ -41,6 +41,7 @@ class PlayerGameState < ActiveRecord::Base
         'misses' => self.misses.count,
         'remaining' => self.remaining.count,
         'enemyHits' => self.enemy_hit_count,
+        'enemyMisses' => self.enemy_misses_count,
         'enemyRemaining' => self.enemy_remaining_count,
       },
       'pusherKey' => Pusher.key
@@ -81,6 +82,11 @@ class PlayerGameState < ActiveRecord::Base
   def enemy_hit_count
     return 0 unless enemy_player_state
     enemy_player_state.hits.count
+  end
+
+  def enemy_misses_count
+    return 0 unless enemy_player_state
+    enemy_player_state.misses.count
   end
 
   def enemy_remaining_count
