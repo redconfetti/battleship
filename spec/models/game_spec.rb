@@ -37,13 +37,11 @@ RSpec.describe Game, type: :model do
     end
 
     it 'includes start date in json' do
-      result = subject.as_json
-      expect(result['startDate']).to eq '01/26/15 04:15 AM'
+      expect(subject.as_json['startDate']).to eq '01/26/15 04:15 AM'
     end
 
     it 'includes start date timestamp in json' do
-      result = subject.as_json
-      expect(result['startDateUnixTimestamp']).to eq 1422245732
+      expect(subject.as_json['startDateUnixTimestamp']).to eq 1422245732
     end
   end
 
