@@ -150,12 +150,6 @@ RSpec.describe GamesController, type: :controller do
       put :fire, id: game_with_players.id, x: 6, y: 8
       expect(response).to have_http_status(:success)
     end
-
-    it 'ends current turn' do
-      expect_any_instance_of(Game).to receive(:end_current_turn)
-      put :fire, id: game_with_players.id, x: 6, y: 8
-      expect(response).to have_http_status(:success)
-    end
   end
 
 end
