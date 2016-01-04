@@ -34,41 +34,6 @@
     <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Your Ships</h3>
-        </div>
-        <div class="panel-body">
-          
-          <table class="grid battle-grid">
-            <tr data-ng-repeat="battleGridRow in playerGameState.battle_grid">
-              <td data-ng-repeat="battleCell in battleGridRow track by $index" data-ng-class="gridSpaceStyle(battleCell)">
-                <div class="grid-spacer"></div>
-              </td>
-            </tr>
-          </table>
-
-          <br>
-          <table class="table table-bordered">
-            <tr>
-              <th scope="row">Hits</th>
-              <td><span data-ng-bind="playerGameState.stats.hits"></span></td>
-            </tr>
-            <tr>
-              <th scope="row">Misses</th>
-              <td><span data-ng-bind="playerGameState.stats.misses"></span></td>
-            </tr>
-            <tr>
-              <th scope="row">Remaining</th>
-              <td><span data-ng-bind="playerGameState.stats.remaining"></span></td>
-            </tr>
-          </table>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
           <h3 class="panel-title">
             Enemy Ships
             <span class="label label-success" data-ng-if="playerControlsEnabled()">Take Shot</span>
@@ -98,6 +63,41 @@
             <tr>
               <th scope="row">Remaining</th>
               <td><span data-ng-bind="playerGameState.stats.enemyRemaining"></span></td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Your Ships</h3>
+        </div>
+        <div class="panel-body">
+          
+          <table class="grid battle-grid">
+            <tr data-ng-repeat="battleGridRow in playerGameState.battle_grid">
+              <td data-ng-repeat="battleCell in battleGridRow track by $index" data-ng-class="gridSpaceStyle(battleCell)">
+                <div class="grid-spacer"></div>
+              </td>
+            </tr>
+          </table>
+
+          <br>
+          <table class="table table-bordered">
+            <tr>
+              <th scope="row">Hits</th>
+              <td><span data-ng-bind="playerGameState.stats.hits"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Misses</th>
+              <td><span data-ng-bind="playerGameState.stats.misses"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Remaining</th>
+              <td><span data-ng-bind="playerGameState.stats.remaining"></span></td>
             </tr>
           </table>
 
