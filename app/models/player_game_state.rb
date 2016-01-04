@@ -41,7 +41,6 @@ class PlayerGameState < ActiveRecord::Base
         'misses' => misses.count,
         'remaining' => remaining.count,
       },
-      'battleGridMisses' => hits.count,
       'pusherKey' => Pusher.key
     })      
   end
