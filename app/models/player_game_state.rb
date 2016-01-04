@@ -56,6 +56,7 @@ class PlayerGameState < ActiveRecord::Base
     battle_grid[x][y] = MISS if battle_grid[x][y] == WATER
     battle_grid[x][y] = HIT if battle_grid[x][y] == SHIP
     update_enemy_tracking(x, y, battle_grid[x][y])
+    save
   end
 
   def update_enemy_tracking(x, y, value)

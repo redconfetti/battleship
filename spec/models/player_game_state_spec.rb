@@ -163,6 +163,11 @@ RSpec.describe PlayerGameState, type: :model do
           expect(subject.enemy_player_state.tracking_grid[3][4]).to eq PlayerGameState::HIT
         end
       end
+
+      it 'saves updates' do
+        subject.receive_shot(3, 4)
+        expect(subject.reload.battle_grid[3][4]).to eq PlayerGameState::MISS
+      end
     end
 
     describe '#update_enemy_tracking' do
