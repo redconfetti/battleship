@@ -63,7 +63,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   $scope.buttonEnabled = function(x, y) {
-    if ($scope.playerGameState && $scope.playerGameState.tracking_grid && $scope.playerGameState.tracking_grid[x][y] == 'w' && $scope.playerControlsEnabled) {
+    if ($scope.playerGameState && $scope.playerGameState.tracking_grid && $scope.playerGameState.tracking_grid[x][y] == 'w' && $scope.playerControlsEnabled()) {
       return true;
     } else {
       return false;
