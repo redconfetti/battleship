@@ -45,7 +45,7 @@
           <table class="grid tracking-grid">
             <tr data-ng-repeat="trackingGridRow in playerGameState.tracking_grid">
               <td data-ng-repeat="trackingCell in trackingGridRow track by $index">
-                <button class="grid-space-button" data-ng-click="fireShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!playerControlsEnabled()"></button>
+                <button class="grid-space-button" data-ng-click="fireShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!buttonEnabled($parent.$index, $index)"></button>
               </td>
             </tr>
           </table>
