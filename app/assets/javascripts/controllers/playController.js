@@ -18,6 +18,15 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   var registerPusherListener = function() {
+    // Enable pusher logging - don't include this in production
+    /*
+    Pusher.log = function(message) {
+      if (window.console && window.console.log) {
+        window.console.log(message);
+      }
+    };
+    */
+
     var pusher = new Pusher($scope.playerGameState.pusherKey, {
       encrypted: true
     });
@@ -25,11 +34,31 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     channel.bind('updated', loadPlayerGameState);
   };
 
-  $scope.isCurrentTurn = function() {
+  var isCurrentTurn = function() {
     if ($scope.playerGameState && $scope.playerGameState.game) {
       return $scope.playerGameState.game.current_player_id === $scope.playerGameState.player_id;
     }
     return false;
+  };
+
+  var gameActive = function() {
+    return ($scope.game && $scope.game.status != 'complete') ? true : false;
+  };
+
+  $scope.awaitingOpponentShot = function() {
+    return (!isCurrentTurn() && gameActive()) ? true : false;
+  };
+
+  $scope.playerControlsEnabled = function() {
+    return (isCurrentTurn() && gameActive()) ? true : false;
+  };
+
+  $scope.isWinner = function() {
+    return ($scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.enemyRemaining < 1) ? true : false;
+  };
+
+  $scope.isLoser = function() {
+    return ($scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.remaining < 1) ? true : false;
   };
 
   // Specifies styles applied to grid spaces based on value
