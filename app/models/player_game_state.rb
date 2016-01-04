@@ -36,10 +36,12 @@ class PlayerGameState < ActiveRecord::Base
   def as_json(options = {})
     options[:include] = [:game, :player]
     super(options).merge({
-      'battleGridStats' => {
-        'hits' => hits.count,
-        'misses' => misses.count,
-        'remaining' => remaining.count,
+      'stats' => {
+        'hits' => self.hits.count,
+        'misses' => self.misses.count,
+        'remaining' => self.remaining.count,
+        'enemyHits' => self.enemy_hit_count,
+        'enemyRemaining' => self.enemy_remaining_count,
       },
       'pusherKey' => Pusher.key
     })      
@@ -74,6 +76,16 @@ class PlayerGameState < ActiveRecord::Base
 
   def remaining
     grid_collect('battle') {|grid, x, y| [x,y] if grid[x][y] == PlayerGameState::SHIP}
+  end
+
+  def enemy_hit_count
+    return 0 unless enemy_player_state
+    enemy_player_state.hits.count
+  end
+
+  def enemy_remaining_count
+    return 0 unless enemy_player_state
+    enemy_player_state.remaining.count
   end
 
   def defeated?
