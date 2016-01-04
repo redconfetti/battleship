@@ -4,6 +4,9 @@ class Game < ActiveRecord::Base
   has_many :player_game_states, dependent: :destroy
   has_many :players, through: :player_game_states
 
+  belongs_to :winner, class_name: Player
+  belongs_to :loser, class_name: Player
+
   def self.create_with_associated_player(player)
     game = Game.create
     game.add_player(player)
@@ -68,15 +71,24 @@ class Game < ActiveRecord::Base
     raise ArgumentError, "Player #{player.id} cannot take a shot. It is not their turn" unless is_turn?(player)
     enemy_player_state = player_state(current_target)
     enemy_player_state.receive_shot(enemy_x, enemy_y)
+
+    if enemy_player_state.reload.defeated?
+      end_game(player, enemy_player_state.player)
+    else
+      end_current_turn
+    end
+    trigger_update
   end
 
   def end_current_turn
     update(current_player_id: current_target.id)
-    trigger_update
   end
 
-  def complete
-    update(status: 'complete')
+  def end_game(winner, loser)
+    self.winner = winner
+    self.loser = loser
+    self.status = 'complete'
+    save
   end
 
 end
