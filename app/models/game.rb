@@ -63,13 +63,20 @@ class Game < ActiveRecord::Base
     update(current_player_id: player.id) if current_player == nil
   end
 
-  def complete
-    update(status: 'complete')
+  def take_shot(player, enemy_x, enemy_y)
+    raise ArgumentError, "Player #{player.id} is not present in this game" unless is_player?(player)
+    raise ArgumentError, "Player #{player.id} cannot take a shot. It is not their turn" unless is_turn?(player)
+    enemy_player_state = player_state(current_target)
+    enemy_player_state.receive_shot(enemy_x, enemy_y)
   end
 
   def end_current_turn
     update(current_player_id: current_target.id)
     trigger_update
+  end
+
+  def complete
+    update(status: 'complete')
   end
 
 end

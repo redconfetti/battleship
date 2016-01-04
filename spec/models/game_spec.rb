@@ -166,6 +166,26 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  describe '#take_shot' do
+    it 'raises exception if player not in game' do
+      expect { game_with_players.take_shot(player3, 6, 2) }.to raise_error(ArgumentError, "Player #{player3.id} is not present in this game")
+    end
+
+    it 'raises exception if not current players turn' do
+      game.add_player(player1)
+      game.add_player(player2)
+      expect { game.take_shot(player2, 6, 2) }.to raise_error(ArgumentError, "Player #{player2.id} cannot take a shot. It is not their turn")
+    end
+
+    it 'sends shot to target player game state' do
+      game.add_player(player1)
+      game.add_player(player2)
+      game.take_shot(player1, 6, 2)
+      enemy_player_state = game.player_state(player2)
+      expect(enemy_player_state.battle_grid[6][2]).to_not eq 'w'
+    end
+  end
+
   describe '#end_current_turn' do
     it 'switches current player' do
       game.add_player(player1)
