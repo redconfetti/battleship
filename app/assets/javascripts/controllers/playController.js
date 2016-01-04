@@ -62,6 +62,14 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     return (gameActive() && $scope.enemyPlayerPresent() && isCurrentTurn() && !$scope.processingShot) ? true : false;
   };
 
+  $scope.buttonEnabled = function(x, y) {
+    if ($scope.playerGameState && $scope.playerGameState.tracking_grid && $scope.playerGameState.tracking_grid[x][y] == 'w' && $scope.playerControlsEnabled) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   $scope.isWinner = function() {
     return ($scope.enemyPlayerPresent() && $scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.enemyRemaining < 1) ? true : false;
   };
