@@ -77,7 +77,7 @@ class PlayerGameState < ActiveRecord::Base
   end
 
   def defeated?
-    remaining.count > 0
+    remaining.count < 1
   end
 
   ###########################

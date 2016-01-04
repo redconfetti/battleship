@@ -220,7 +220,7 @@ RSpec.describe PlayerGameState, type: :model do
         subject.place_ship(2, 4, 2, PlayerGameState::SOUTH)
         subject.receive_shot(2, 4) # hit
         subject.receive_shot(2, 6) # miss
-        expect(subject.defeated?).to eq true
+        expect(subject.defeated?).to eq false
       end
 
       it 'returns true when ship placements all hit' do
@@ -228,7 +228,7 @@ RSpec.describe PlayerGameState, type: :model do
         subject.place_ship(2, 4, 2, PlayerGameState::SOUTH)
         subject.receive_shot(2, 4) # hit
         subject.receive_shot(2, 5) # hit
-        expect(subject.defeated?).to eq false
+        expect(subject.defeated?).to eq true
       end
     end
   end
