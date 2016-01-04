@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
+  before { allow(Pusher).to receive(:trigger).and_return(nil) }
+
   let(:game)              { create(:game) }
   let(:game_with_players) { create(:game_with_players) }
   let(:player1)           { game_with_players.players[0] }
@@ -37,13 +39,11 @@ RSpec.describe Game, type: :model do
     end
 
     it 'includes start date in json' do
-      result = subject.as_json
-      expect(result['startDate']).to eq '01/26/15 04:15 AM'
+      expect(subject.as_json['startDate']).to eq '01/26/15 04:15 AM'
     end
 
     it 'includes start date timestamp in json' do
-      result = subject.as_json
-      expect(result['startDateUnixTimestamp']).to eq 1422245732
+      expect(subject.as_json['startDateUnixTimestamp']).to eq 1422245732
     end
   end
 
@@ -164,6 +164,11 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       expect(game.current_player).to eq player1
     end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update).at_least(:once)
+      game.add_player(player1)
+    end
   end
 
   describe '#take_shot' do
@@ -208,11 +213,6 @@ RSpec.describe Game, type: :model do
         game.take_shot(player1, 6, 2)
       end
     end
-
-    it 'notifies players of update to game state' do
-      expect(game).to receive(:trigger_update)
-      game.take_shot(player1, 6, 2)
-    end
   end
 
   describe '#end_current_turn' do
@@ -222,6 +222,14 @@ RSpec.describe Game, type: :model do
       expect(game.current_player).to eq player1
       game.end_current_turn
       expect(game.reload.current_player).to eq player2
+    end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update).at_least(:once)
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+      game.end_current_turn
     end
   end
 
@@ -245,6 +253,13 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       subject.end_game(player1, player2)
       expect(subject.reload.status).to eq 'complete'
+    end
+
+    it 'notifies players of update to game state' do
+      expect(subject).to receive(:trigger_update)
+      game.add_player(player1)
+      game.add_player(player2)
+      subject.end_game(player1, player2)
     end
   end
 

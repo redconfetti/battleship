@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
+  before { allow(Pusher).to receive(:trigger).and_return(nil) }
+
   let(:game) { create(:game) }
   let(:player1) { create(:player1) }
   let(:player2) { create(:player2) }
