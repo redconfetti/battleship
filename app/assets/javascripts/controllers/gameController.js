@@ -20,7 +20,6 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
 
   // Establishes current game and game play route path
   var setCurrentGame = function(game) {
-    console.log(game);
     $scope.currentPlayerGame = game;
     $scope.currentPlayerGame.playPath = '/#/play/' + game.id;
   };
@@ -33,7 +32,6 @@ angular.module('battleship').controller('GameController', ['$http', '$scope', '$
       $scope.incompleteGames = response.data;
       Auth.currentUser().then(function(user) {
         $scope.incompleteGames = segregatePlayerGames(response.data, user);
-        console.log($scope.incompleteGames);
         if ($scope.incompleteGames.playersGames.length > 0) {
           setCurrentGame($scope.incompleteGames.playersGames[0]);
         }
