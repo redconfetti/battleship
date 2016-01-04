@@ -145,10 +145,10 @@ RSpec.describe GamesController, type: :controller do
       expect(json_response['error']).to eq "It is not your turn"
     end
 
-    it 'ends current turn' do
+    it 'takes shot against opponent player' do
+      expect_any_instance_of(Game).to receive(:take_shot)
       put :fire, id: game_with_players.id, x: 6, y: 8
       expect(response).to have_http_status(:success)
-      json_response = JSON.parse(response.body)
     end
   end
 

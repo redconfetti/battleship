@@ -7,13 +7,18 @@ class PlayerGameState < ActiveRecord::Base
   serialize :battle_grid, Array
   serialize :tracking_grid, Array
 
-  before_create :init_grids
+  before_create :initialize_state
   before_create :build_battle_grid
 
-  # grid states
-  # w = water
-  # s = ship
-  # h = hit ship
+  # Grid States
+  WATER = 'w'
+  SHIP = 's'
+  HIT = 'h'
+  MISS = 'm'
+
+  # Grid Movements
+  SOUTH = 'S'
+  EAST = 'E'
 
   FLEET = [5,4,3,2,2,1,1]
 
@@ -23,7 +28,7 @@ class PlayerGameState < ActiveRecord::Base
 
   # Limits to two players associated with game
   def limit_two_per_game
-    if self.class.for_game(self.game_id).count > 1
+    if new_record? && self.class.for_game(self.game_id).count > 1
       errors.add(:game, "Cannot add more than 2 players to a Game")
     end
   end
@@ -31,19 +36,77 @@ class PlayerGameState < ActiveRecord::Base
   def as_json(options = {})
     options[:include] = [:game, :player]
     super(options).merge({
+      'stats' => {
+        'hits' => self.hits.count,
+        'misses' => self.misses.count,
+        'remaining' => self.remaining.count,
+        'enemyHits' => self.enemy_hit_count,
+        'enemyMisses' => self.enemy_misses_count,
+        'enemyRemaining' => self.enemy_remaining_count,
+      },
       'pusherKey' => Pusher.key
     })      
+  end
+
+  def enemy_player_state
+    game.player_game_states.where.not(id: id).first
+  end
+
+  ###########################
+  # Battle Actions
+  def receive_shot(x, y)
+    battle_grid[x][y] = MISS if battle_grid[x][y] == WATER
+    battle_grid[x][y] = HIT if battle_grid[x][y] == SHIP
+    update_enemy_tracking(x, y, battle_grid[x][y])
+    save
+  end
+
+  def update_enemy_tracking(x, y, value)
+    enemy = enemy_player_state
+    enemy.tracking_grid[x][y] = value
+    enemy.save
+  end
+
+  def hits
+    grid_collect('battle') {|grid, x, y| [x,y] if grid[x][y] == PlayerGameState::HIT}
+  end
+
+  def misses
+    grid_collect('battle') {|grid, x, y| [x,y] if grid[x][y] == PlayerGameState::MISS}
+  end
+
+  def remaining
+    grid_collect('battle') {|grid, x, y| [x,y] if grid[x][y] == PlayerGameState::SHIP}
+  end
+
+  def enemy_hit_count
+    return 0 unless enemy_player_state
+    enemy_player_state.hits.count
+  end
+
+  def enemy_misses_count
+    return 0 unless enemy_player_state
+    enemy_player_state.misses.count
+  end
+
+  def enemy_remaining_count
+    return 0 unless enemy_player_state
+    enemy_player_state.remaining.count
+  end
+
+  def defeated?
+    remaining.count < 1
   end
 
   ###########################
   # Grid Generation
 
-  def init_grids
+  def initialize_state
     grid = []
     (0..9).to_a.each do |x|
       grid[x] = []
       (0..9).to_a.each do |y|
-        grid[x][y] = 'w'
+        grid[x][y] = WATER
       end
     end
     self.tracking_grid = grid.dup
@@ -63,7 +126,7 @@ class PlayerGameState < ActiveRecord::Base
     positions = {}
 
     grid_map!('battle') do |grid, x, y|
-      ['S', 'E'].each do |direction|
+      [SOUTH, EAST].each do |direction|
         if valid_placement?(x, y, length, direction)
           available_placements << [x, y, direction]
         end
@@ -77,7 +140,7 @@ class PlayerGameState < ActiveRecord::Base
     raise ArgumentError, "Invalid placement for #{length} space ship at [#{x},#{y}] positioned #{direction}" unless valid_placement?(x, y, length, direction)
     ship_coordinates = get_coordinates(x, y, length, direction)
     ship_coordinates.each do |space|
-      battle_grid[space[0]][space[1]] = 's'
+      battle_grid[space[0]][space[1]] = SHIP
     end
   end
 
@@ -86,7 +149,7 @@ class PlayerGameState < ActiveRecord::Base
     coordinates = get_coordinates(x, y, length, direction)
     return false if !coordinates
     coordinates.each do |coordinate|
-      return false if battle_grid[coordinate[0]][coordinate[1]] != 'w'
+      return false if battle_grid[coordinate[0]][coordinate[1]] != WATER
     end
     true
   end
@@ -110,9 +173,9 @@ class PlayerGameState < ActiveRecord::Base
 
   # Returns coordinates for position East or South of provided position
   def neighbor_position(x, y, direction)
-    raise ArgumentError, "Direction '#{direction}' is invalid. Must be 'S' or 'E'" if ['E','S'].index(direction) == nil
-    return [x + 1, y] if direction == 'E'
-    return [x, y + 1] if direction == 'S'
+    raise ArgumentError, "Direction '#{direction}' is invalid. Must be '#{SOUTH}' or '#{EAST}'" if [EAST, SOUTH].index(direction) == nil
+    return [x + 1, y] if direction == EAST
+    return [x, y + 1] if direction == SOUTH
   end
 
   # Returns false if coordinate outside of grid

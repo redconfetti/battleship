@@ -3,9 +3,24 @@
 </div>
 
 <div class="container-fluid" data-ng-hide="displayError">
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="alert alert-danger" role="alert" data-ng-if="isLoser()">
+        Sorry. You Lose!
+        <a href="/#/games">Play Again</a>
+      </div>
+
+      <div class="alert alert-success" role="alert" data-ng-if="isWinner()">
+        Congratulations! You Win!
+        <a href="/#/games">Play Again</a>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
 
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Your Ships</h3>
@@ -20,26 +35,19 @@
             </tr>
           </table>
 
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">
-            Enemy Ships
-            <span class="label label-success" data-ng-if="isCurrentTurn()">Take Shot</span>
-            <span class="label label-danger" data-ng-if="!isCurrentTurn()">Awaiting Enemy Shot</span>
-          </h3>
-        </div>
-        <div class="panel-body">
-
-          <table class="grid tracking-grid">
-            <tr data-ng-repeat="trackingGridRow in playerGameState.tracking_grid">
-              <td data-ng-repeat="trackingCell in trackingGridRow track by $index">
-                <button class="grid-space-button" data-ng-click="fireShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!isCurrentTurn()"></button>
-              </td>
+          <br>
+          <table class="table table-bordered">
+            <tr>
+              <th scope="row">Hits</th>
+              <td><span data-ng-bind="playerGameState.stats.hits"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Misses</th>
+              <td><span data-ng-bind="playerGameState.stats.misses"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Remaining</th>
+              <td><span data-ng-bind="playerGameState.stats.remaining"></span></td>
             </tr>
           </table>
 
@@ -47,10 +55,43 @@
       </div>
     </div>
 
-    <div class="col-md-4">
-      <h4>
-        Status
-      </h4>      
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Enemy Ships
+            <span class="label label-success" data-ng-if="playerControlsEnabled()">Take Shot</span>
+            <span class="label label-danger" data-ng-if="awaitingOpponentShot()">Awaiting Enemy Shot</span>
+          </h3>
+        </div>
+        <div class="panel-body">
+
+          <table class="grid tracking-grid">
+            <tr data-ng-repeat="trackingGridRow in playerGameState.tracking_grid">
+              <td data-ng-repeat="trackingCell in trackingGridRow track by $index">
+                <button class="grid-space-button" data-ng-click="fireShot($parent.$index, $index)" data-ng-class="gridSpaceStyle(trackingCell)" data-ng-disabled="!playerControlsEnabled()"></button>
+              </td>
+            </tr>
+          </table>
+
+          <br>
+          <table class="table table-bordered">
+            <tr>
+              <th scope="row">Hit</th>
+              <td><span data-ng-bind="playerGameState.stats.enemyHits"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Misses</th>
+              <td><span data-ng-bind="playerGameState.stats.enemyMisses"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Remaining</th>
+              <td><span data-ng-bind="playerGameState.stats.enemyRemaining"></span></td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
     </div>
 
   </div>

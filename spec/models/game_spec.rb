@@ -166,6 +166,55 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  describe '#take_shot' do
+    before do
+      game.add_player(player1)
+      game.add_player(player2)
+    end
+
+    it 'raises exception if player not in game' do
+      expect { game_with_players.take_shot(player3, 6, 2) }.to raise_error(ArgumentError, "Player #{player3.id} is not present in this game")
+    end
+
+    it 'raises exception if not current players turn' do
+      expect { game.take_shot(player2, 6, 2) }.to raise_error(ArgumentError, "Player #{player2.id} cannot take a shot. It is not their turn")
+    end
+
+    it 'sends shot to target player game state' do
+      game.take_shot(player1, 6, 2)
+      enemy_player_state = game.player_state(player2)
+      expect(enemy_player_state.battle_grid[6][2]).to_not eq 'w'
+    end
+
+    context 'when enemy is defeated' do
+      it 'ends game' do
+        enemy_player_state = game.player_state(player2)
+        enemy_player_state.initialize_state
+        enemy_player_state.battle_grid[6][2] = 's'
+        enemy_player_state.save
+        expect(game).to receive(:end_game).with(player1, player2)
+        game.take_shot(player1, 6, 2)
+      end
+    end
+
+    context 'when enemy is not defeated' do
+      it 'ends current turn' do
+        enemy_player_state = game.player_state(player2)
+        enemy_player_state.initialize_state
+        enemy_player_state.battle_grid[6][2] = 's'
+        enemy_player_state.battle_grid[6][3] = 's'
+        enemy_player_state.save
+        expect(game).to receive(:end_current_turn)
+        game.take_shot(player1, 6, 2)
+      end
+    end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update)
+      game.take_shot(player1, 6, 2)
+    end
+  end
+
   describe '#end_current_turn' do
     it 'switches current player' do
       game.add_player(player1)
@@ -174,18 +223,27 @@ RSpec.describe Game, type: :model do
       game.end_current_turn
       expect(game.reload.current_player).to eq player2
     end
-
-    it 'notifies players of update to game state' do
-      expect(game).to receive(:trigger_update)
-      game.add_player(player1)
-      game.add_player(player2)
-      game.end_current_turn
-    end
   end
 
-  describe '#complete' do
+  describe '#end_game' do
+    it 'sets the winner of the game' do
+      game.add_player(player1)
+      game.add_player(player2)
+      subject.end_game(player1, player2)
+      expect(subject.reload.winner).to eq player1
+    end
+
+    it 'sets the loser of the game' do
+      game.add_player(player1)
+      game.add_player(player2)
+      subject.end_game(player2, player1)
+      expect(subject.reload.loser).to eq player1
+    end
+
     it 'updates game status as complete' do
-      subject.complete
+      game.add_player(player1)
+      game.add_player(player2)
+      subject.end_game(player1, player2)
       expect(subject.reload.status).to eq 'complete'
     end
   end

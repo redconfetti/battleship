@@ -8,7 +8,6 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
       url: '/games/'+ $routeParams.gameId + '.json'
     }).then(function successCallback(response) {
       $scope.playerGameState = response.data;
-      console.log($scope.playerGameState);
       if (!pushListenerRegistered) {
         registerPusherListener();
         pushListenerRegistered = true;
@@ -35,11 +34,31 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
     channel.bind('updated', loadPlayerGameState);
   };
 
-  $scope.isCurrentTurn = function() {
+  var isCurrentTurn = function() {
     if ($scope.playerGameState && $scope.playerGameState.game) {
       return $scope.playerGameState.game.current_player_id === $scope.playerGameState.player_id;
     }
     return false;
+  };
+
+  var gameActive = function() {
+    return ($scope.game && $scope.game.status != 'complete') ? true : false;
+  };
+
+  $scope.awaitingOpponentShot = function() {
+    return (!isCurrentTurn() && gameActive()) ? true : false;
+  };
+
+  $scope.playerControlsEnabled = function() {
+    return (isCurrentTurn() && gameActive()) ? true : false;
+  };
+
+  $scope.isWinner = function() {
+    return ($scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.enemyRemaining < 1) ? true : false;
+  };
+
+  $scope.isLoser = function() {
+    return ($scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.remaining < 1) ? true : false;
   };
 
   // Specifies styles applied to grid spaces based on value
@@ -52,15 +71,17 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
       case 's':
         styles['grid-space-ship'] = true
         break;
-      case 's':
+      case 'h':
         styles['grid-space-hit'] = true
+        break;
+      case 'm':
+        styles['grid-space-miss'] = true
         break;
     }
     return styles;
   }
 
   $scope.fireShot = function(xCoord, yCoord) {
-    console.log('shot fired at X: ' + xCoord + ', Y: ' + yCoord);
     $http({
       method: 'PUT',
       url: '/games/'+ $routeParams.gameId + '/fire.json',
@@ -69,7 +90,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
         y: yCoord
       }
     }).then(function successCallback(response) {
-      console.log(response.data);
+      // console.log(response.data);
     }, function errorCallback(response) {
       $scope.displayError = 'Error firing shot';
     });
