@@ -12,6 +12,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
         registerPusherListener();
         pushListenerRegistered = true;
       }
+      $scope.processingShot = false;
     }, function errorCallback(response) {
       $scope.displayError = 'Unable to load player game state';
     });
@@ -58,7 +59,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   $scope.playerControlsEnabled = function() {
-    return (gameActive() && $scope.enemyPlayerPresent() && isCurrentTurn()) ? true : false;
+    return (gameActive() && $scope.enemyPlayerPresent() && isCurrentTurn() && !$scope.processingShot) ? true : false;
   };
 
   $scope.isWinner = function() {
@@ -90,6 +91,7 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   }
 
   $scope.fireShot = function(xCoord, yCoord) {
+    $scope.processingShot = true;
     $http({
       method: 'PUT',
       url: '/games/'+ $routeParams.gameId + '/fire.json',
