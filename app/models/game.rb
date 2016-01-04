@@ -77,18 +77,16 @@ class Game < ActiveRecord::Base
     else
       end_current_turn
     end
-    trigger_update
   end
 
   def end_current_turn
     update(current_player_id: current_target.id)
+    trigger_update
   end
 
   def end_game(winner, loser)
-    self.winner = winner
-    self.loser = loser
-    self.status = 'complete'
-    save
+    update(winner: winner, loser: loser, status: 'complete')
+    trigger_update
   end
 
 end

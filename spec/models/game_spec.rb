@@ -208,11 +208,6 @@ RSpec.describe Game, type: :model do
         game.take_shot(player1, 6, 2)
       end
     end
-
-    it 'notifies players of update to game state' do
-      expect(game).to receive(:trigger_update)
-      game.take_shot(player1, 6, 2)
-    end
   end
 
   describe '#end_current_turn' do
@@ -222,6 +217,14 @@ RSpec.describe Game, type: :model do
       expect(game.current_player).to eq player1
       game.end_current_turn
       expect(game.reload.current_player).to eq player2
+    end
+
+    it 'notifies players of update to game state' do
+      expect(game).to receive(:trigger_update)
+      game.add_player(player1)
+      game.add_player(player2)
+      expect(game.current_player).to eq player1
+      game.end_current_turn
     end
   end
 
@@ -245,6 +248,13 @@ RSpec.describe Game, type: :model do
       game.add_player(player2)
       subject.end_game(player1, player2)
       expect(subject.reload.status).to eq 'complete'
+    end
+
+    it 'notifies players of update to game state' do
+      expect(subject).to receive(:trigger_update)
+      game.add_player(player1)
+      game.add_player(player2)
+      subject.end_game(player1, player2)
     end
   end
 
