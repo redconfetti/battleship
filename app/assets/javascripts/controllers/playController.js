@@ -42,7 +42,15 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   var gameActive = function() {
-    return ($scope.game && $scope.game.status != 'complete') ? true : false;
+    return ($scope.playerGameState && $scope.playerGameState.game && $scope.playerGameState.game.status !== 'complete') ? true : false;
+  };
+
+  $scope.enemyPlayerPresent = function() {
+    return ($scope.playerGameState && $scope.playerGameState.enemy && $scope.playerGameState.enemy.id) ? true : false;
+  };
+
+  $scope.gamePrematurelyClosed = function() {
+    return (!gameActive() && !$scope.isWinner() && !$scope.isLoser()) ? true : false;
   };
 
   $scope.awaitingOpponentShot = function() {
@@ -50,11 +58,11 @@ angular.module('battleship').controller('PlayController', ['$http', '$routeParam
   };
 
   $scope.playerControlsEnabled = function() {
-    return (isCurrentTurn() && gameActive()) ? true : false;
+    return (gameActive() && $scope.enemyPlayerPresent() && isCurrentTurn()) ? true : false;
   };
 
   $scope.isWinner = function() {
-    return ($scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.enemyRemaining < 1) ? true : false;
+    return ($scope.enemyPlayerPresent() && $scope.playerGameState && $scope.playerGameState.stats && $scope.playerGameState.stats.enemyRemaining < 1) ? true : false;
   };
 
   $scope.isLoser = function() {

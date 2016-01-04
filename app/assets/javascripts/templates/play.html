@@ -6,6 +6,17 @@
 
   <div class="row">
     <div class="col-md-12">
+
+      <div class="alert alert-info" role="alert" data-ng-if="!enemyPlayerPresent()">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+        Waiting for Player 2 to join
+      </div>
+
+      <div class="alert alert-danger" role="alert" data-ng-if="gamePrematurelyClosed()">
+        Sorry. This game has been prematurely ended.
+        <a href="/#/games">Play Again</a>
+      </div>
+
       <div class="alert alert-danger" role="alert" data-ng-if="isLoser()">
         Sorry. You Lose!
         <a href="/#/games">Play Again</a>
