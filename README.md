@@ -23,12 +23,13 @@ See [Battleship game](https://en.wikipedia.org/wiki/Battleship_%28game%29) for f
 ## Setup
 
 1. Install [RVM](https://rvm.io/rvm/install)
-2. Install [Homebrew](http://brew.sh/)
-3. Clone this application to a local repository
-4. Use `bundle install` to install RubyGem dependencies
-5. Use `brew install node` to install NodeJS / Node Package Manager (NPM)
-6. Use `npm install -g bower` to globally install Bower
-7. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
+1. Install [Homebrew](http://brew.sh/)
+1. Clone this application to a local repository
+1. Use `brew install node` to install NodeJS / Node Package Manager (NPM)
+1. Use `brew install postgres` to install Postgres, then `brew services start postgresql` to start the service
+1. Use `npm install -g bower` to globally install Bower
+1. Use `bundle install` to install RubyGem dependencies
+1. Install [Heroku Toolbelt](https://toolbelt.heroku.com/)
 
 ## Bower
 
