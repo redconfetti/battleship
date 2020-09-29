@@ -49,7 +49,7 @@ gem 'angular-rails-templates'
 gem 'angular_csrf'
 
 # Needed for compatibility with angular-rails-templates
-gem 'sprockets', '2.12.3'
+gem 'sprockets', '2.12.5'
 
 # Manage Procfile-based applications
 gem "foreman"

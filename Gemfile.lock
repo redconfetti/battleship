@@ -181,7 +181,7 @@ GEM
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
     spring (2.1.1)
-    sprockets (2.12.3)
+    sprockets (2.12.5)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
@@ -230,7 +230,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   spring
-  sprockets (= 2.12.3)
+  sprockets (= 2.12.5)
   uglifier (>= 1.3.0)
   web-console (~> 2.0)
 
